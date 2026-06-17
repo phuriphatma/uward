@@ -12,19 +12,13 @@
 </head>
 
 <body>
-  <tab-buttons></tab-buttons>
   <header>
     <div class="header-content">
       <div class="header-text">
         <!-- <h2>bili AAP 2022 new Hyperbilirubinemia</h2> -->
-
-        <button id="forceRefreshBtn" type="button" class="refresh-btn"
-          title="Force refresh to get latest updates from GitHub Pages">🔄 Force
-          Refresh</button>
-        <!-- <p class="disclaimer">For demonstration only, inspired by https://peditools.org/bili2022/</p> -->
       </div>
       <div class="tab" style="margin-bottom:2em;">
-        <button class="tablinks" onclick="openMainTab(event, 'MainApp')" id="defaultMainTab">Main App</button>
+        <button class="tablinks" onclick="openMainTab(event, 'MainApp')" id="defaultMainTab">Bilirubin</button>
         <button class="tablinks" onclick="openMainTab(event, 'WeightCalculator')">Weight
           Calculator</button>
       </div>
@@ -42,12 +36,13 @@
       <section class="card results-card" style="position:sticky; top:0em; z-index:2;">
         <h2>Results</h2>
         <div id="summary" class="summary"></div>
-        <div class="actions">
-          <button id="peditoolsApiBtn" type="button">Fetch PediTools 2022 API</button>
-          <button id="showApiDetailsBtn" style="margin-left:1em;">Show API
+        <div class="actions" style="display:none;">
+          <button id="peditoolsApiBtn" type="button">Re-check PediTools</button>
+          <button id="showApiDetailsBtn" style="margin-left:1em; display:none;">Show API
             Details</button>
         </div>
-        <div id="peditoolsResult" class="summary" style="margin-top:0em;"></div>
+        <!-- Auto-verifies against PediTools 2022 when online; concise status here. -->
+        <div id="peditoolsResult" class="summary api-verify" style="margin-top:6px;"></div>
       </section>
       <div style="display: flex; gap: 2em; align-items: flex-start; margin-top:0em;">
         <aside style="flex: 1 1 350px; min-width: 300px; max-width: 400px;">

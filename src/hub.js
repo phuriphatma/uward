@@ -1,4 +1,5 @@
 import './shell/shell.css'; // design tokens
+import './shell/theme.css'; // shared modern baseline
 import './hub.css';
 import { WARDS, toolHref } from './shell/tools.js';
 import { openTerms } from './shell/consent.js'; // also self-mounts the first-use terms gate

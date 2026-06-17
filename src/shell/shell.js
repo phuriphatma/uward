@@ -5,6 +5,7 @@
 // It is intentionally framework-free and self-mounting so each migrated tool
 // needs no changes beyond that one script tag.
 import './shell.css';
+import './theme.css'; // shared modern baseline across all tools
 import { WARDS, ALL_TOOLS, toolHref, hubHref, currentToolId } from './tools.js';
 import { openTerms } from './consent.js'; // also self-mounts the first-use terms gate
 

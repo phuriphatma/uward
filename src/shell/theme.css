@@ -1,0 +1,45 @@
+/* ===================================================================
+   Shared modern baseline — loaded on every tool + the hub (after shell.css,
+   which defines the --u-* tokens). Uses html-body + :where() so it provides a
+   consistent look where a tool doesn't specify its own, but never fights a
+   tool's bespoke styles (zero/low specificity, no !important). Safe to apply
+   across the whole suite.
+   =================================================================== */
+
+/* Typography + canvas: unify the font and background across tools. */
+html body {
+  font-family: var(--u-font);
+  color: var(--u-ink);
+  background: var(--u-bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Form controls: consistent, tappable, with a clear focus ring (baseline only). */
+:where(input[type='text'], input[type='number'], input[type='date'],
+       input[type='search'], input[type='tel'], select, textarea) {
+  font-family: inherit;
+  font-size: 16px;
+  color: var(--u-ink);
+  background: var(--u-surface);
+  border: 1px solid var(--u-line);
+  border-radius: 10px;
+  padding: 9px 11px;
+  box-sizing: border-box;
+}
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--u-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, .15);
+}
+
+/* Headings inherit the ink colour for a consistent tone. */
+:where(h1, h2, h3, h4) { color: var(--u-ink); }
+
+/* Links use the brand primary. */
+:where(a) { color: var(--u-primary); }
+
+/* Comfortable tap target for any control on touch. */
+@media (pointer: coarse) {
+  :where(button, input, select, textarea) { min-height: 40px; }
+}

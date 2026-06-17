@@ -363,6 +363,9 @@
       headerHtml = `<div class="primary-threshold">${aapEx} mg/dL</div>`;
     }
 
+    // Automatically double-check against the live PediTools API when online.
+    scheduleApiVerify(ga, age, risk, aapPt, aapEx);
+
     // Meta line under header
     const metaParts = [];
     metaParts.push(`<strong>GA:</strong> ${ga} wks`);
@@ -732,6 +735,60 @@
       $('#peditoolsResult').innerHTML = `<span style="color:red;">Error fetching API: ${e.message}</span>`;
     }
   }
+
+  // ---- Auto double-check against PediTools AAP 2022 (online) with concise status ----
+  // PediTools sends no CORS header, so the browser can't call it directly. We go
+  // through our own same-origin proxy — a Cloudflare Pages Function at /bili-api
+  // (functions/bili-api.js). On hosts without that function (e.g. GitHub Pages)
+  // or when offline, the check degrades quietly to "unavailable" and the local
+  // AAP 2022 result (shown in #summary) still stands.
+  const _verify = { timer: null, cache: {} };
+  function _setVerify(html) { const el = document.querySelector('#peditoolsResult'); if (el) el.innerHTML = html; }
+  function _riskParam(uiRisk) { return uiRisk === 'no_risk' ? 'none' : (uiRisk === 'both' ? 'both' : 'any'); }
+  function _parsePediTools(htmlText, wantRisk) {
+    const txt = htmlText.replace(/<(script|style)[^>]*>[\s\S]*?<\/\1>/gi, ' ').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+    const label = wantRisk === 'none' ? 'No neurotoxicity risk factors' : 'ANY neurotoxicity risk factors';
+    const re = new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*([0-9]+(?:\\.[0-9]+)?)\\s*mg/dL\\s*([0-9]+(?:\\.[0-9]+)?)\\s*mg/dL', 'i');
+    const m = txt.match(re);
+    return m ? { photo: parseFloat(m[1]), exch: parseFloat(m[2]) } : null;
+  }
+  function _renderVerify(api, localPhoto, localExchange) {
+    if (!api) { _setVerify('<span class="api-muted">PediTools check unavailable</span>'); return; }
+    if (localPhoto == null && localExchange == null) {
+      _setVerify(`<span class="api-ok">PediTools 2022 · photo ${api.photo} / exch ${api.exch} mg/dL</span>`);
+      return;
+    }
+    const okP = localPhoto == null || Math.abs(localPhoto - api.photo) <= 0.11;
+    const okE = localExchange == null || Math.abs(localExchange - api.exch) <= 0.11;
+    if (okP && okE) _setVerify('<span class="api-ok">✓ Verified with PediTools 2022</span>');
+    else _setVerify(`<span class="api-diff">⚠ Differs — PediTools: photo ${api.photo} / exch ${api.exch} mg/dL</span>`);
+  }
+  function scheduleApiVerify(ga, age, risk, localPhoto, localExchange) {
+    const el = document.querySelector('#peditoolsResult'); if (!el) return;
+    if (!ga || typeof age !== 'number' || isNaN(age)) { el.innerHTML = ''; return; }
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) { _setVerify('<span class="api-muted">Offline — local AAP 2022 only</span>'); return; }
+    const rp = _riskParam(risk);
+    const key = ga + '|' + age + '|' + rp;
+    if (_verify.cache[key]) { _renderVerify(_verify.cache[key], localPhoto, localExchange); return; }
+    if (_verify.timer) clearTimeout(_verify.timer);
+    _setVerify('<span class="api-muted">Checking PediTools…</span>');
+    _verify.timer = setTimeout(async () => {
+      try {
+        const base = location.pathname.replace(/tools\/bili\/.*$/, '');
+        const url = base + 'bili-api?ga=' + encodeURIComponent(ga) + '&age=' + encodeURIComponent(age) + '&risk=' + rp;
+        const resp = await fetch(url, { cache: 'no-store' });
+        if (!resp.ok) throw new Error('proxy ' + resp.status);
+        const parsed = _parsePediTools(await resp.text(), rp);
+        if (!parsed) throw new Error('parse');
+        _verify.cache[key] = parsed;
+        _renderVerify(parsed, localPhoto, localExchange);
+      } catch (e) {
+        _setVerify('<span class="api-muted">PediTools check unavailable</span>');
+      }
+    }, 500);
+  }
+  // The old manual button (now hidden) just recomputes, which re-runs the check.
+  fetchPediToolsBili2022 = function () { computeSummary(); };
 
   // Attach event listeners for API and test buttons
   if (document.readyState === 'loading') {

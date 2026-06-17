@@ -30,6 +30,10 @@ function perPageManifestLinks() {
             { tag: 'link', attrs: { rel: 'apple-touch-icon', href: up + 'icons/icon-192.png' }, injectTo: 'head' },
             { tag: 'meta', attrs: { name: 'apple-mobile-web-app-capable', content: 'yes' }, injectTo: 'head' },
             { tag: 'meta', attrs: { name: 'mobile-web-app-capable', content: 'yes' }, injectTo: 'head' },
+            // Shared Inter webfont on every page (graceful system fallback offline).
+            { tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.googleapis.com' }, injectTo: 'head' },
+            { tag: 'link', attrs: { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }, injectTo: 'head' },
+            { tag: 'link', attrs: { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap' }, injectTo: 'head' },
           ],
         };
       },
