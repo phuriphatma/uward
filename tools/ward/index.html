@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Ward & Bed Manager + Patient Profile</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+<!-- Vendored (offline) — formerly CDN. Classic globals consumed by assets/app.js. -->
+<script src="/vendor/crypto-js.js"></script>
+<script src="/vendor/xlsx.full.min.js"></script>
+<link rel="stylesheet" href="assets/app.css">
+<style>
+  /* Make room for the uWard shell bar (sticky, 52px). The ward sidebar and its
+     backdrop are position:fixed, so offset their top on phones; same for the
+     mobile profile sheet. Desktop sidebar is in normal flow (no change). */
+  @media (max-width:768px){
+    #sidebar{ top: 52px !important; }
+    #sidebarBackdrop{ top: 52px !important; }
+    #profileMenuPanel{ top: 60px !important; }
+  }
+</style>
+</head>
+<body>
+<div id="container">
+  <div id="sidebar">
+    <div id="sidebarHeader">
+      <div class="brand">
+        <span class="brand-mark">✚</span>
+        <span class="brand-name">Ward Manager</span>
+      </div>
+      <button id="quickIOBtn" title="Open a Quick Ward Note / I/O calculator without a bed — save it to a ward later">⚡ Quick I/O note</button>
+      <nav class="side-nav">
+        <button id="wardWorkBtn"><span class="nav-ico">📋</span> Ward work</button>
+        <button id="notesBtn"><span class="nav-ico">📝</span> Notes</button>
+        <button id="presetsBtn"><span class="nav-ico">⚙️</span> Ward presets</button>
+      </nav>
+      <!-- Profile (workspace) selector -->
+      <div id="profilesMenu" class="profiles-menu">
+        <button id="profileMenuBtn" title="Switch profile">Profile</button>
+        <div id="profileMenuPanel" style="display:none; position:absolute; right:0; top:100%; margin-top:6px; background:#fff; max-height:60vh; overflow:auto; z-index:50;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid #eee;">
+            <strong>Profiles</strong>
+            <button id="closeProfilePanel" class="ghost" title="Close">×</button>
+          </div>
+          <ul id="profileList" style="list-style:none; margin:0; padding:6px 0;"></ul>
+          <div style="display:flex; gap:6px; padding:10px 12px; border-top:1px solid #eee; position:sticky; bottom:0; background:#fff; flex-wrap:wrap;">
+            <button id="profNewBtn" title="Create a new, empty profile">New</button>
+            <button id="profNewSheetBtn" title="Create a profile from a Google Sheet">Import from Sheet</button>
+            <button id="profDupBtn" title="Duplicate the current profile">Duplicate</button>
+            <button id="profRenBtn" title="Rename the current profile">Rename</button>
+            <button id="profDelBtn" title="Delete the current profile" class="delete">Delete</button>
+            <button id="profRefreshSheetBtn" style="margin-left:auto; display:none;" title="Re-import from the linked Google Sheet">Refresh</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="wardListContainer">
+      <div class="ward-list-head">
+        <span class="wl-title">Wards</span>
+        <div class="wl-tools">
+          <button id="addWardBtn" title="Add a ward">+</button>
+          <button id="editWardsBtn" title="Edit / delete wards">✎</button>
+        </div>
+      </div>
+      <div id="wardListPrefs" style="display:flex; align-items:center; gap:8px; padding:6px 6px 0; font-size:12px; color:#555;">
+        <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+          <input type="checkbox" id="wardOnlyBedsToggle" /> Only show wards with patients
+        </label>
+      </div>
+      <ul id="wardList"></ul>
+      <div class="controls">
+        <button id="exportBtn" title="Save an encrypted backup file">Back up</button>
+        <button id="importBtn" title="Restore from a backup file">Restore</button>
+        <input type="file" id="fileInput" style="display:none">
+      </div>
+    </div>
+  </div>
+  <div id="resizer"></div>
+  <div id="main">
+    <!-- Ward Work View -->
+  <div id="wardWorkPage" style="display:none;flex-direction:column;padding:16px 16px 140px 16px;overflow-y:auto;width:100%;">
+      <button id="backToBedsFromWW" style="margin-bottom:12px;">← Back</button>
+      <header>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <h2 style="margin:0;">Ward Work</h2>
+          <div id="wwProfilesMenu" style="position:relative;">
+            <button id="wwProfileMenuBtn" class="ghost" style="border:1px solid #ddd; padding:6px 10px; border-radius:6px;">Document</button>
+            <div id="wwProfileMenuPanel" style="display:none; position:absolute; right:0; top:100%; margin-top:6px; background:#fff; border:1px solid #ddd; border-radius:8px; box-shadow:0 6px 24px rgba(0,0,0,0.1); width:280px; max-height:60vh; overflow:auto; z-index:50;">
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-bottom:1px solid #eee;">
+                <strong>WardWork Documents</strong>
+                <button id="wwCloseProfilePanel" class="ghost" title="Close">×</button>
+              </div>
+              <ul id="wwProfileList" style="list-style:none; margin:0; padding:6px 0;"></ul>
+              <div style="display:flex; gap:6px; padding:10px 12px; border-top:1px solid #eee; position:sticky; bottom:0; background:#fff; flex-wrap:wrap;">
+                <button id="wwProfNewBtn" title="Create a new document">New</button>
+                <button id="wwProfDupBtn" title="Duplicate this document">Duplicate</button>
+                <button id="wwProfRenBtn" title="Rename this document">Rename</button>
+                <button id="wwProfDelBtn" title="Delete this document" class="delete">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="color:#666;font-size:12px;margin-top:4px;">Fast list for wardwork tasks</div>
+      </header>
+      <section class="card" style="max-width:720px;">
+        <div class="row" style="gap:8px;align-items:flex-end;flex-wrap:wrap;">
+          <label style="flex:0 0 auto;min-width:140px;">Date
+            <input type="date" id="wwDate" />
+          </label>
+          <label style="flex:1;min-width:200px;">Title
+            <input type="text" id="wwTitle" placeholder="e.g., 🔆 WW 8/11/25 🔆" />
+          </label>
+        </div>
+        <datalist id="wwWardListGlobal"></datalist>
+      </section>
+      <section class="card" style="max-width:720px;">
+        <!-- Tasks heading removed per request -->
+        <div id="wwSnippetBar" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px;align-items:center;">
+          <button id="wwSnipToggle" class="ghost" type="button">Snippets</button>
+        </div>
+        <!-- inline panel removed in favor of modal; keeping node hidden for future use -->
+        <div id="wwSnipPanel" style="display:none;"></div>
+        <div id="wwList" style="display:grid;gap:12px"></div>
+        <div class="row" style="gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:12px; margin-bottom:64px;">
+          <button id="wwAddBlock" class="save-btn">+ Block</button>
+        </div>
+      </section>
+      <section id="wwPreviewSection" class="card" style="max-width:720px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <h3 style="margin:0;">Preview</h3>
+          <button id="wwCopy" class="ghost">Copy</button>
+          <button id="wwPreviewToggle" class="ghost" style="margin-left:auto;">Hide</button>
+        </div>
+        <textarea id="wwPreviewTa" rows="10" style="width:100%;margin-top:8px;white-space:pre; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;"></textarea>
+      </section>
+      <!-- WardWork bottom sheet preview for mobile -->
+      <div id="wwMobilePreviewSheet" class="mobile-preview-sheet">
+        <div class="sheet-header">
+          <div class="grabber" id="wwSheetGrabber"></div>
+          <div class="title">Preview</div>
+          <div class="sheet-actions">
+            <button id="wwCopyMobile">Copy</button>
+            <button id="wwCloseSheet" class="ghost">Close</button>
+          </div>
+        </div>
+        <div id="wwMobilePreviewBody" class="sheet-body" style="width:100%">
+          <pre id="wwPreviewMobile" class="preview" contenteditable="true" spellcheck="false" style="flex:1;min-height:0; white-space:pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;"></pre>
+        </div>
+      </div>
+      <button id="wwTogglePreview" class="fab-preview">Preview</button>
+      <!-- WardWork Snippets Modal -->
+      <div id="wwSnipModal" class="modal">
+        <div class="modal-content" style="max-width:520px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:10px;">
+            <h2 style="margin:0;">Snippets</h2>
+            <button id="wwSnipClose" class="ghost" title="Close">×</button>
+          </div>
+          <div id="wwSnipList" style="display:flex; flex-direction:column; gap:8px;"></div>
+          <div style="display:flex; gap:8px; margin-top:10px; align-items:center;">
+            <input id="wwSnipNew" type="text" placeholder="Add frequent task…" style="flex:1; padding:8px;" />
+            <button id="wwSnipAdd" class="save-btn">Add</button>
+          </div>
+          <div style="margin-top:8px; font-size:12px; color:#666;">Tip: Tap ⧉+ on a block to insert a snippet quickly.</div>
+        </div>
+      </div>
+      <!-- WardWork Rename Modal -->
+      <div id="wwRenameModal" class="modal">
+        <div class="modal-content" style="max-width:480px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:10px;">
+            <h2 style="margin:0;">Rename Document</h2>
+            <button id="wwRenameClose" class="ghost" title="Close">×</button>
+          </div>
+          <label style="display:block; margin-bottom:12px;">
+            Document Name
+            <input id="wwRenameNameInput" type="text" style="width:100%; padding:8px; margin-top:4px;" />
+          </label>
+          <label style="display:block; margin-bottom:12px;">
+            Document Title
+            <input id="wwRenameTitleInput" type="text" style="width:100%; padding:8px; margin-top:4px;" />
+          </label>
+          <div style="display:flex; gap:8px; justify-content:flex-end;">
+            <button id="wwRenameCancel" class="ghost">Cancel</button>
+            <button id="wwRenameSave" class="save-btn">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Notes Page -->
+    <div id="notesPage" style="display:none;flex-direction:column;padding:16px 16px 140px 16px;overflow-y:auto;width:100%;">
+      <button id="backToBedsFromNotes" style="margin-bottom:12px;">← Back</button>
+      <header>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <h2 style="margin:0;">Notes</h2>
+            <button id="notesCopyBtn" class="ghost" title="Copy all text" style="font-size:20px;padding:4px 8px;">📋</button>
+          </div>
+          <div id="notesProfilesMenu" style="position:relative;">
+            <button id="notesProfileMenuBtn" class="ghost" style="border:1px solid #ddd; padding:6px 10px; border-radius:6px;">Document</button>
+            <div id="notesProfileMenuPanel" style="display:none; position:absolute; right:0; top:100%; margin-top:6px; background:#fff; border:1px solid #ddd; border-radius:8px; box-shadow:0 6px 24px rgba(0,0,0,0.1); width:280px; max-height:60vh; overflow:auto; z-index:50;">
+              <div style="display:flex; align-items:center; justify-content:space-between; padding:10px 12px; border-bottom:1px solid #eee;">
+                <strong>Notes Documents</strong>
+                <button id="notesCloseProfilePanel" class="ghost" title="Close">×</button>
+              </div>
+              <ul id="notesProfileList" style="list-style:none; margin:0; padding:6px 0;"></ul>
+              <div style="display:flex; gap:6px; padding:10px 12px; border-top:1px solid #eee; position:sticky; bottom:0; background:#fff; flex-wrap:wrap;">
+                <button id="notesProfNewBtn" title="Create a new note">New</button>
+                <button id="notesProfDupBtn" title="Duplicate this note">Duplicate</button>
+                <button id="notesProfRenBtn" title="Rename this note">Rename</button>
+                <button id="notesProfDelBtn" title="Delete this note" class="delete">Delete</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="color:#666;font-size:12px;margin-top:4px;">Free text for personal notes</div>
+      </header>
+      <section class="card" style="max-width:720px;">
+        <div id="notesEditableContent" contenteditable="true" style="min-height:600px;max-height:600px;overflow-y:auto;padding:12px;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,'Liberation Mono','Courier New',monospace;font-size:14px;line-height:1.5;white-space:pre-wrap;outline:none;border:1px solid #ddd;border-radius:4px;" spellcheck="false"></div>
+        <textarea id="notesTextarea" style="display:none;"></textarea>
+      </section>
+      <!-- Notes Rename Modal -->
+      <div id="notesRenameModal" class="modal">
+        <div class="modal-content" style="max-width:480px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:10px;">
+            <h2 style="margin:0;">Rename Document</h2>
+            <button id="notesRenameClose" class="ghost" title="Close">×</button>
+          </div>
+          <label style="display:block; margin-bottom:12px;">
+            Document Name
+            <input id="notesRenameInput" type="text" style="width:100%; padding:8px; margin-top:4px;" />
+          </label>
+          <div style="display:flex; gap:8px; justify-content:flex-end;">
+            <button id="notesRenameCancel" class="ghost">Cancel</button>
+            <button id="notesRenameSave" class="save-btn">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="bedContainer">
+      <button id="mobileProfileChip" type="button" aria-label="Switch or add profile" title="Switch or add profile">
+        <span class="mpc-eyebrow">Profile</span><span class="mpc-name">Default</span><span class="mpc-caret">⌄</span>
+      </button>
+      <div class="bed-head">
+        <h2 id="wardTitle">Select a ward</h2>
+        <label class="status-filter">Show
+          <select id="statusFilter">
+            <option value="both">All patients</option>
+            <option value="active">Active only</option>
+            <option value="discharge">Discharge only</option>
+          </select>
+        </label>
+      </div>
+      <div class="bed-toolbar">
+        <select id="wardPicker" aria-label="Select ward"></select>
+        <button id="addBedBtn" disabled>+ Add bed</button>
+        <button id="selectBedsBtn" class="btn btn-ghost btn-sm">Select</button>
+        <button id="moveSelectedBtn" class="btn btn-primary btn-sm" style="display:none;">Move selected (0)</button>
+        <button id="clearSelectionBtn" class="btn btn-ghost btn-sm" style="display:none;">Clear</button>
+      </div>
+      <div id="bedList"></div>
+    </div>
+
+    <div id="profilePage" style="display:none;flex-direction:column;padding:16px;overflow-y:auto;width:100%;">
+      <button id="backToBedsBtn" style="margin-bottom:12px;">← Back to Beds</button>
+    <header>
+      <h1>Quick Ward Note
+        <select id="headerStatusSelect" style="margin-left:6px;">
+          <option value="active">Active</option>
+          <option value="discharge">Discharge</option>
+        </select>
+      </h1>
+      <div class="sub" id="profileSubtitle">Fast template for bedside updates</div>
+    </header>
+
+    <main>
+      <div class="layout">
+        <div class="col col-form">
+          <section class="card">
+            <h2>Patient</h2>
+            <div style="display:flex; gap:8px; margin-bottom:12px;">
+              <button type="button" class="ghost" id="copyHeaderBtn" style="flex:1; font-size:13px;">📋 Copy Header</button>
+              <button type="button" class="ghost" id="copyHeaderHNBtn" style="flex:1; font-size:13px;">📋 Copy w/ HN</button>
+            </div>
+            <div class="row">
+              <label>Bed/Room
+                <input id="bed" placeholder="e.g., กว6/1 รวม3 — ชื่อผู้ป่วย" />
+              </label>
+            </div>
+            <div class="row">
+              <label>HN
+                <input id="hn" placeholder="e.g., 1234567" />
+              </label>
+            </div>
+            <div class="row">
+              <label>Status
+                <select id="statusSelect" style="min-width:140px;">
+                  <option value="active">Active</option>
+                  <option value="discharge">Discharge</option>
+                </select>
+              </label>
+            </div>
+            <label>Hashtags / Dx (multiline)
+              <textarea id="hashtags" rows="6" placeholder="CCA c HCV cirrhosis S/P Rt. hepatectomy&#10;U/D HT"></textarea>
+            </label>
+          </section>
+
+          <section class="card">
+            <h2>Clinical (Cli)</h2>
+            <textarea id="cli" rows="8" placeholder="สรุปอาการ: ..."></textarea>
+          </section>
+
+          <section class="card">
+            <h2>Mx</h2>
+            <textarea id="mx" rows="3" placeholder="แผนการรักษา / Management..."></textarea>
+          </section>
+
+          <section class="card">
+            <h2>V/S</h2>
+            <div class="grid vs">
+              <label>BT <input id="bt" placeholder="36.9" /></label>
+              <label>PR <input id="pr" placeholder="74" /></label>
+              <label>RR <input id="rr" placeholder="18" /></label>
+              <label>BP <input id="bp" placeholder="143/75" /></label>
+              <label>O2sat <input id="o2" placeholder="96%" /></label>
+            </div>
+          </section>
+
+          <section class="card io-card morning">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <h2>I/O เช้า</h2>
+              <button type="button" class="ghost io-edit-btn" data-block="morning" style="font-size:14px;">✎ Edit</button>
+            </div>
+            <div class="io-block" data-block="morning">
+              <div class="row between"><div class="tag">I</div><button type="button" class="ghost io-snippets-btn" data-type="in" style="margin-left:8px;">⚙️ Snippets</button></div>
+              <div class="lines in"></div>
+              <button type="button" class="add add-in" style="margin:8px 0;">+ Add</button>
+              <div class="row between"><div class="tag">O</div><button type="button" class="ghost io-snippets-btn" data-type="out" style="margin-left:8px;">⚙️ Snippets</button></div>
+              <div class="lines out"></div>
+              <button type="button" class="add add-out" style="margin:8px 0;">+ Add</button>
+              <div class="override">
+                <div class="tag">Override totals (optional)</div>
+                <div class="row">
+                  <label>I <input class="override-in" placeholder="e.g., 1960" /></label>
+                  <label>O <input class="override-out" placeholder="e.g., 1300" /></label>
+                </div>
+              </div>
+              <div class="totals">Total: <span class="sum-in">0</span>/<span class="sum-out">0</span> (<span class="net">0</span>)</div>
+            </div>
+          </section>
+
+          <section class="card io-card afternoon">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <h2>I/O บ่าย</h2>
+              <button type="button" class="ghost io-edit-btn" data-block="afternoon" style="font-size:14px;">✎ Edit</button>
+            </div>
+            <div class="io-block" data-block="afternoon">
+              <div class="row between"><div class="tag">I</div><button type="button" class="ghost io-snippets-btn" data-type="in" style="margin-left:8px;">⚙️ Snippets</button></div>
+              <div class="lines in"></div>
+              <button type="button" class="add add-in" style="margin:8px 0;">+ Add</button>
+              <div class="row between"><div class="tag">O</div><button type="button" class="ghost io-snippets-btn" data-type="out" style="margin-left:8px;">⚙️ Snippets</button></div>
+              <div class="lines out"></div>
+              <button type="button" class="add add-out" style="margin:8px 0;">+ Add</button>
+              <div class="override">
+                <div class="tag">Override totals (optional)</div>
+                <div class="row">
+                  <label>I <input class="override-in" placeholder="e.g., 1242" /></label>
+                  <label>O <input class="override-out" placeholder="e.g., 1180" /></label>
+                </div>
+              </div>
+              <div class="totals">Total: <span class="sum-in">0</span>/<span class="sum-out">0</span> (<span class="net">0</span>)</div>
+            </div>
+          </section>
+
+          <section class="actions">
+            <button id="copy">Copy</button>
+            <button id="saveProfileBtn" class="save-btn" style="background:#2563eb;color:white;border:none;">Save</button>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <!-- Mobile sticky preview bottom sheet -->
+    <div id="mobilePreviewSheet" class="mobile-preview-sheet">
+      <div class="sheet-header">
+        <div class="grabber" id="sheetGrabber"></div>
+        <div class="title">Preview</div>
+        <div class="sheet-actions">
+          <button id="copyMobile">Copy</button>
+          <button id="closeSheet" class="ghost">Close</button>
+        </div>
+      </div>
+      <div id="mobilePreviewBody" class="sheet-body">
+        <pre id="output" class="preview" contenteditable="true" spellcheck="false"></pre>
+      </div>
+    </div>
+
+    <!-- Floating toggle for mobile -->
+    <button id="togglePreview" class="fab-preview">Preview</button>
+    <button id="resetFab" class="fab-reset">Reset</button>
+    </div>
+  </div>
+  
+  
+  </div>
+  <button id="expandSidebarBtn">&#9776;</button>
+</div>
+
+<!-- Mobile bottom navigation (phones only) -->
+<nav id="mobileTabBar" aria-label="Main navigation">
+  <button type="button" data-tab="beds"><span class="mt-ico">🛏️</span><span class="mt-label">Beds</span></button>
+  <button type="button" data-tab="work"><span class="mt-ico">📋</span><span class="mt-label">Work</span></button>
+  <button type="button" data-tab="quick" class="mt-primary"><span class="mt-ico">⚡</span><span class="mt-label">Quick</span></button>
+  <button type="button" data-tab="notes"><span class="mt-ico">📝</span><span class="mt-label">Notes</span></button>
+  <button type="button" data-tab="more"><span class="mt-ico">☰</span><span class="mt-label">More</span></button>
+</nav>
+
+<!-- Presets Modal -->
+<div id="presetsModal" class="modal">
+  <div class="modal-content">
+    <h2>Ward Presets</h2>
+    <label>Preset name
+      <input id="presetName" placeholder="e.g., Surgery" />
+    </label>
+    <label>Ward names (one per line)
+      <textarea id="presetWards" rows="8" placeholder="One ward name per line, e.g.&#10;3ก&#10;กว6/1&#10;ICU"></textarea>
+    </label>
+    <div class="row" style="gap:8px; align-items:center;">
+      <label style="flex:1">Existing presets
+        <select id="presetSelect"></select>
+      </label>
+      <button id="loadPresetBtn">Load</button>
+      <button id="deletePresetBtn" class="save-btn" style="background:#ff7676">Delete</button>
+    </div>
+    <div class="actions">
+      <button id="closePresetBtn">Close</button>
+      <button id="savePresetBtn" class="save-btn">Save Preset</button>
+      <button id="applyPresetBtn" class="save-btn">Apply Preset</button>
+    </div>
+  </div>
+  
+</div>
+
+<!-- Move Bed Modal -->
+<div id="moveBedModal" class="modal">
+  <div class="modal-content">
+    <h2>Move Bed</h2>
+    <div class="row">
+      <label style="flex:1">Destination Profile
+        <select id="moveProfileSelect"></select>
+      </label>
+      <label style="flex:1">Destination Ward
+        <select id="moveWardSelect"></select>
+      </label>
+    </div>
+    <div class="row" id="moveNewWardRow" style="display:none;">
+      <label style="flex:1">New Ward Name
+        <input id="moveNewWardName" placeholder="e.g., 3ก" />
+      </label>
+    </div>
+    <div class="actions">
+      <button id="moveCancelBtn">Cancel</button>
+      <button id="moveConfirmBtn" class="save-btn">Move</button>
+    </div>
+  </div>
+</div>
+
+<!-- Save Draft Note Modal -->
+<div id="saveDraftModal" class="modal">
+  <div class="modal-content">
+    <h2>Save Note to a Ward</h2>
+    <p style="margin:6px 0 12px; font-size:13px; color:#555;">This note isn't attached to a bed yet. Pick where to save it — a new bed will be created for you.</p>
+    <label>Ward
+      <select id="saveDraftWardSelect"></select>
+    </label>
+    <div class="row" id="saveDraftNewWardRow" style="display:none;">
+      <label style="flex:1">New ward name
+        <input id="saveDraftNewWardName" placeholder="e.g., 3ก" />
+      </label>
+    </div>
+    <div class="actions">
+      <button id="saveDraftCancelBtn">Cancel</button>
+      <button id="saveDraftConfirmBtn" class="save-btn">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- I/O Snippets Modal -->
+<div id="ioSnippetsModal" class="modal">
+  <div class="modal-content" style="max-width:520px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:8px; margin-bottom:10px;">
+      <h2 style="margin:0;" id="ioSnippetsTitle">I/O Snippets</h2>
+      <button id="ioSnippetsClose" class="ghost" title="Close">×</button>
+    </div>
+    <div id="ioSnippetsList" style="display:flex; flex-direction:column; gap:8px;"></div>
+    <div style="display:flex; gap:8px; margin-top:10px; align-items:center;">
+      <input id="ioSnippetsNew" type="text" placeholder="Add snippet…" style="flex:1; padding:8px;" />
+      <button id="ioSnippetsAdd" class="save-btn">Add</button>
+    </div>
+  </div>
+</div>
+
+<!-- Google Sheet Profile Modal -->
+<div id="sheetProfileModal" class="modal">
+  <div class="modal-content">
+    <h2>Import patients from Google Sheets</h2>
+    <p style="margin:4px 0 12px; font-size:13px; color:#555;">Bring a ward list in from a Google Sheet in three quick steps.</p>
+
+    <!-- Step 1: link -->
+    <div class="sheet-step">
+      <div class="sheet-step-title">Step 1 · Paste your sheet link</div>
+      <details style="margin:4px 0 8px; font-size:12px; color:#555;">
+        <summary style="cursor:pointer; color:#007bff;">How do I get the link?</summary>
+        <ol style="margin:6px 0 0; padding-left:18px; line-height:1.6;">
+          <li>In Google Sheets, open <strong>File → Share → Publish to web</strong>.</li>
+          <li>Choose the tab (or “Entire document”) and pick <strong>Comma-separated values (.csv)</strong>.</li>
+          <li>Click <strong>Publish</strong>, then copy the link it gives you and paste it below.</li>
+        </ol>
+      </details>
+      <label>Sheet link (CSV)
+        <input id="sheetCsvUrl" placeholder="Paste the published .csv link here" />
+      </label>
+      <label style="font-weight:400; font-size:13px;">
+        <input type="checkbox" id="sheetHasHeader" checked /> The first row is a header (column titles)
+      </label>
+      <div style="display:flex; gap:8px; align-items:center; margin-top:6px; flex-wrap:wrap;">
+        <button id="sheetFetchBtn" class="save-btn">Load sheet →</button>
+        <span id="sheetFetchStatus" style="font-size:12px;color:#777;"></span>
+      </div>
+    </div>
+
+    <!-- Step 2: tab (only useful when the workbook has several tabs) -->
+    <div class="sheet-step" id="sheetTabsRow" style="margin-top:14px;">
+      <div class="sheet-step-title">Step 2 · Choose a tab <span style="font-weight:400; color:#999;">(only if your sheet has more than one)</span></div>
+      <label>Tab name
+        <input id="sheetTabName" placeholder="e.g., Gen3 ตึกเก่า — then press Enter" />
+      </label>
+      <div style="color:#999; font-size:12px; margin-top:2px;">Type the tab’s name and press Enter, or just click one below.</div>
+      <div id="sheetTabNamesWrap" style="display:none; margin-top:8px;">
+        <div style="font-size:12px; color:#666; margin-bottom:4px;">Tabs in this sheet — tap one to load it:</div>
+        <div id="sheetTabChips" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
+      </div>
+    </div>
+
+    <!-- Step 3: map columns -->
+    <div id="sheetMapping" class="sheet-step" style="display:none; margin-top:14px;">
+      <div class="sheet-step-title">Step 3 · Match your columns</div>
+      <p style="margin:2px 0 10px; font-size:12px; color:#666;">Tell the app which column holds what. Use the dropdowns, or press <strong>Pick</strong> and then tap a column in the preview below.</p>
+      <div class="row">
+        <label style="flex:1; display:flex; gap:6px; align-items:center;">Ward
+          <select id="colWard" style="flex:1"></select>
+          <button id="pickWardBtn" type="button">Pick</button>
+        </label>
+        <label style="flex:1; display:flex; gap:6px; align-items:center;">Bed / Room
+          <select id="colBed" style="flex:1"></select>
+          <button id="pickBedBtn" type="button">Pick</button>
+        </label>
+      </div>
+      <div class="row">
+        <label style="flex:1; display:flex; gap:6px; align-items:center;">Patient name
+          <select id="colName" style="flex:1"></select>
+          <button id="pickNameBtn" type="button">Pick</button>
+        </label>
+        <label style="flex:1; display:flex; gap:6px; align-items:center;">Diagnosis (Dx)
+          <select id="colDx" style="flex:1"></select>
+          <button id="pickDxBtn" type="button">Pick</button>
+        </label>
+      </div>
+      <div class="row">
+        <label style="flex:1; display:flex; gap:6px; align-items:center;">Status <span style="font-weight:400;color:#999;">(optional)</span>
+          <select id="colStatus" style="flex:1"></select>
+          <button id="pickStatusBtn" type="button">Pick</button>
+        </label>
+        <div style="flex:1; color:#999; font-size:12px;">“active / admit” → Active · “discharge / dc / d/c” → Discharge.</div>
+      </div>
+      <div class="row">
+        <label style="flex:1; display:flex; gap:6px; align-items:center;">HN <span style="font-weight:400;color:#999;">(optional)</span>
+          <select id="colHN" style="flex:1"></select>
+          <button id="pickHNBtn" type="button">Pick</button>
+        </label>
+        <div style="flex:1; color:#999; font-size:12px;">Hospital number / MRN, if your sheet has one.</div>
+      </div>
+      <label style="font-weight:400; font-size:13px;">
+        <input type="checkbox" id="appendNameToBed" checked /> Show the patient’s name next to the bed
+      </label>
+      <div id="sheetPickStatus" style="margin-top:6px; font-size:12px; color:#007bff; display:none;">Now tap a column in the preview…</div>
+      <div style="margin-top:12px; font-weight:600;">Preview</div>
+      <div id="sheetTableWrap" style="max-height:320px; overflow:auto; border:1px solid #ddd; border-radius:6px; margin-top:6px;">
+        <table id="sheetTable" style="border-collapse:collapse; width:100%; font-size:12px;">
+          <!-- populated dynamically -->
+        </table>
+      </div>
+    </div>
+    <div class="actions">
+      <button id="sheetCancelBtn">Cancel</button>
+      <button id="sheetCreateBtn" class="save-btn" disabled>Create profile</button>
+    </div>
+  </div>
+</div>
+
+<script src="assets/app.js"></script>
+<!-- Tool switcher / shell -->
+<script type="module" src="/src/shell/shell.js"></script>
+</body>
+</html>

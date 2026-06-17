@@ -1,0 +1,21 @@
+{
+  "name": "uward",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "uward — unified clinical tools PWA (OB-GYN, Pediatrics, Ward Management)",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --host"
+  },
+  "dependencies": {
+    "crypto-js": "^4.2.0",
+    "flatpickr": "^4.6.13",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "vite": "^5.4.11",
+    "vite-plugin-pwa": "^0.21.1"
+  }
+}

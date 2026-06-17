@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Neonatal Age & Bilirubin (Demo)</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="/icons/icon.svg" type="image/svg+xml" />
+  <meta name="theme-color" content="#0ea5e9" />
+
+</head>
+
+<body>
+  <tab-buttons></tab-buttons>
+  <header>
+    <div class="header-content">
+      <div class="header-text">
+        <!-- <h2>bili AAP 2022 new Hyperbilirubinemia</h2> -->
+
+        <button id="forceRefreshBtn" type="button" class="refresh-btn"
+          title="Force refresh to get latest updates from GitHub Pages">🔄 Force
+          Refresh</button>
+        <!-- <p class="disclaimer">For demonstration only, inspired by https://peditools.org/bili2022/</p> -->
+      </div>
+      <div class="tab" style="margin-bottom:2em;">
+        <button class="tablinks" onclick="openMainTab(event, 'MainApp')" id="defaultMainTab">Main App</button>
+        <button class="tablinks" onclick="openMainTab(event, 'WeightCalculator')">Weight
+          Calculator</button>
+      </div>
+      <!-- <div class="header-actions">
+        <button id="forceRefreshBtn" type="button" class="refresh-btn"
+          title="Force refresh to get latest updates from GitHub Pages">🔄 Force Refresh</button>
+      </div> -->
+    </div>
+  </header>
+
+
+  <div id="MainApp" class="tabcontent">
+    <main>
+
+      <section class="card results-card" style="position:sticky; top:0em; z-index:2;">
+        <h2>Results</h2>
+        <div id="summary" class="summary"></div>
+        <div class="actions">
+          <button id="peditoolsApiBtn" type="button">Fetch PediTools 2022 API</button>
+          <button id="showApiDetailsBtn" style="margin-left:1em;">Show API
+            Details</button>
+        </div>
+        <div id="peditoolsResult" class="summary" style="margin-top:0em;"></div>
+      </section>
+      <div style="display: flex; gap: 2em; align-items: flex-start; margin-top:0em;">
+        <aside style="flex: 1 1 350px; min-width: 300px; max-width: 400px;">
+          <!-- Show API Details button moved to Results card actions -->
+          <div id="peditoolsApiDetailsOverlay"
+            style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:9999;overflow:auto;">
+            <div
+              style="background:#fff;max-width:600px;margin:3em auto;padding:2em;border-radius:8px;box-shadow:0 2px 16px #0002;position:relative;">
+              <button id="closeApiDetailsBtn" style="position:absolute;top:1em;right:1em;">Close</button>
+              <div id="peditoolsApiDetailsContent"></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+      </section>
+      <!-- <div style="display: flex; gap: 2em; align-items: flex-start; margin-top:2em;">
+      <aside style="flex: 1 1 350px; min-width: 300px; max-width: 400px;">
+        <h3 style="margin-top:0;">PediTools Page Preview:</h3>
+<div id="peditoolsIframePreview" style="margin:0;">
+  <iframe id="peditoolsIframe" src="" style="width:100%; height:600px; border:none; transform:scale(0.8); transform-origin:0 0;"></iframe>
+</div>
+      </aside>
+    </div> -->
+
+      <section class="card" style="margin-top:0em;">
+        <!-- <h2>Inputs</h2> -->
+        <form id="controls" onsubmit="return false;">
+          <div class="grid">
+            <label>
+              <span>Gestation at birth</span>
+              <select id="ga">
+                <option value="35">35 weeks</option>
+                <option value="36">36 weeks</option>
+                <option value="37">37 weeks</option>
+                <option value="38">38 weeks</option>
+                <option value="39">39 weeks</option>
+                <option value="40">40+ weeks</option>
+              </select>
+            </label>
+
+            <label>
+              <span>Age (hours)</span>
+              <input id="ageHours" type="text" placeholder="e.g., 24 or 12,24,48" />
+              <small>1–336 hours; comma-separated list allowed</small>
+            </label>
+
+            <label>
+              <span>Bilirubin (mg/dL)</span>
+              <input id="bili" type="text" placeholder="optional; e.g., 10 or 8,9,11" />
+              <small>Optional; comma-separated list allowed</small>
+            </label>
+
+            <fieldset class="inline">
+              <legend>Neurotoxicity risks</legend>
+              <label><input type="radio" name="risk" value="no_risk" /> No risk
+                factors</label>
+              <label><input type="radio" name="risk" value="any_risk" checked /> ANY
+                risk
+                factors</label>
+              <label><input type="radio" name="risk" value="both" /> Show both</label>
+            </fieldset>
+
+
+          </div>
+
+          <div class="actions">
+            <button id="resetBtn" type="reset">Reset form</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Optional age calculator</h2>
+        <div class="grid">
+          <label>
+            <span>Date of birth</span>
+            <input id="dob" type="datetime-local" />
+          </label>
+          <label>
+            <span>Date of measurement</span>
+            <input id="dom" type="datetime-local" />
+          </label>
+          <div class="actions">
+            <button id="calcAgeBtn" type="button">Calculate age</button>
+          </div>
+        </div>
+      </section>
+
+
+
+      <section class="card">
+        <h2>Verify AAP table (optional)</h2>
+        <p class="small">Paste 15 rows × 24 values (360 numbers) for the selected GA. Choose
+          Exchange (Table 4) or
+          Phototherapy (Table 2). Non-numeric text will be ignored.</p>
+        <div class="grid">
+          <label>
+            <span>Dataset</span>
+            <select id="datasetKind">
+              <option value="exchange" selected>Exchange (AAP Table 4)</option>
+              <option value="phototherapy">Phototherapy (AAP Table 2)</option>
+            </select>
+          </label>
+          <label>
+            <span>Paste table values</span>
+            <textarea id="verifyInput" rows="6"
+              style="width:100%;font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"></textarea>
+          </label>
+        </div>
+        <div class="actions">
+          <button id="verifyBtn" type="button">Verify against JS dataset</button>
+          <button id="exportBtn" type="button">Export JS dataset JSON</button>
+        </div>
+        <div id="verifyOutput" class="summary"></div>
+
+        <hr />
+        <h3>Convert pasted table to JS dataset rows</h3>
+        <p class="small">Converts the day/hour table into array-of-arrays rows, ready to
+          paste
+          inside the dataset file.
+        </p>
+        <div class="actions">
+          <button id="convertBtn" type="button">Convert to JS rows</button>
+          <button id="copyConvertBtn" type="button">Copy output</button>
+        </div>
+        <label>
+          <span class="small">JS rows output</span>
+          <textarea id="convertOutput" rows="8" readonly
+            style="width:100%;font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"></textarea>
+        </label>
+      </section>
+
+      <section class="card">
+        <h2>Usage notes</h2>
+        <ul>
+          <li>Leave bilirubin blank to view thresholds only.</li>
+          <li>Enter comma-separated ages and bilirubin to plot trends.</li>
+          <li>Recommendation is based on the last age/value pair provided.</li>
+        </ul>
+        <details>
+          <summary>Neurotoxicity risk factors (examples)</summary>
+          <ul>
+            <li>Albumin &lt; 3 g/dL</li>
+            <li>Isoimmune hemolytic disease</li>
+            <li>G6PD deficiency or other hemolytic conditions</li>
+            <li>Sepsis or clinical instability in the prior 24 hours</li>
+            <li>Prematurity is accounted for by gestational-age selection</li>
+          </ul>
+        </details>
+        <p class="disclaimer small">References: AAP 2022 Hyperbilirubinemia guideline. This
+          demo
+          does not reproduce the
+          original curves; values shown are illustrative.</p>
+
+        <hr />
+        <div class="actions">
+          <button id="testAllAnyRiskBtn" type="button">Check all thresholds (any
+            risk)</button>
+        </div>
+        <div id="testAllAnyRiskModal"
+          style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:9999;overflow:auto;">
+          <div
+            style="background:#fff;max-width:700px;margin:3em auto;padding:2em;border-radius:8px;box-shadow:0 2px 16px #0002;position:relative;">
+            <button id="testAllAnyRiskModalClose" style="position:absolute;top:1em;right:1em;">Close</button>
+            <h3>Any Risk Threshold Test Results</h3>
+            <div id="testAllAnyRiskModalContent" style="max-height:60vh;overflow:auto;white-space:pre-wrap;"></div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div id="WeightCalculator" class="tabcontent">
+    <section class="card"
+      style="max-width:420px;margin:2em auto;padding:2em;background:#f9fafb;border-radius:8px;box-shadow:0 2px 16px #0002;">
+      <h2 style="margin-top:0;">Weight Delta Calculator</h2>
+      <div class="grid">
+        <label><span>Birth weight (g)</span><input id="birthWeight" type="number" min="0" step="1"
+            placeholder="e.g., 3200" /></label>
+        <label><span>Current weight (g)</span><input id="currentWeight" type="number" min="0" step="1"
+            placeholder="e.g., 2950" /></label>
+        <label><span>Yesterday's weight (g)</span><input id="yesterdayWeight" type="number" min="0" step="1"
+            placeholder="e.g., 2970" /></label>
+      </div>
+      <div id="weightDeltaResult" style="margin-top:1em;"></div>
+      <div style="margin-top:2em;">
+        <strong>How to use:</strong>
+        <ul style="margin-top:0.5em;">
+          <li>Enter birth, current, and yesterday's weight in grams.</li>
+          <li>Delta from birth = (current - birth) / birth × 100 (%)</li>
+          <li>Change from yesterday = current - yesterday (g)</li>
+          <li>Use to monitor weight loss/gain in neonates.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+
+  <script src="thresholds_demo.js"></script>
+  <script src="thresholds_aap_anyrisk_exchange.js"></script>
+  <script src="thresholds_aap_anyrisk_phototherapy.js"></script>
+  <script src="app.js"></script>
+  <script>
+    // Tabs logic for main app and weight calculator
+    function openMainTab(evt, tabName) {
+      var i, tabcontent, tablinks;
+      tabcontent = document.querySelectorAll('.tabcontent');
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+      tablinks = document.querySelectorAll('.tablinks');
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+      document.getElementById(tabName).style.display = "block";
+      evt.currentTarget.className += " active";
+    }
+
+    // Weight delta calculator logic
+    function updateWeightDelta() {
+      const birth = Number(document.getElementById('birthWeight').value);
+      const current = Number(document.getElementById('currentWeight').value);
+      const yesterday = Number(document.getElementById('yesterdayWeight').value);
+      let percentDelta = '';
+      let dailyDelta = '';
+      if (birth > 0 && current > 0) {
+        percentDelta = (((current - birth) / birth) * 100).toFixed(2);
+      }
+      if (current > 0 && yesterday > 0) {
+        dailyDelta = (current - yesterday).toFixed(2);
+      }
+      let out = '';
+      out += `<div><strong>Birth weight:</strong> ${birth || '-'} g</div>`;
+      out += `<div><strong>Current weight:</strong> ${current || '-'} g</div>`;
+      out += `<div><strong>Yesterday's weight:</strong> ${yesterday || '-'} g</div>`;
+      out += `<div style='margin-top:8px;'><strong>Delta from birth:</strong> ${percentDelta !== '' ? percentDelta + ' %' : '-'} </div>`;
+      out += `<div><strong>Change from yesterday:</strong> ${dailyDelta !== '' ? dailyDelta + ' g' : '-'} </div>`;
+      document.getElementById('weightDeltaResult').innerHTML = out;
+    }
+
+    window.addEventListener('DOMContentLoaded', function () {
+      document.getElementById('defaultMainTab').click();
+      ['birthWeight', 'currentWeight', 'yesterdayWeight'].forEach(id => {
+        var el = document.getElementById(id);
+        if (el) el.addEventListener('input', updateWeightDelta);
+      });
+      updateWeightDelta();
+    });
+  </script>
+  <script>
+    // Force refresh functionality
+    async function forceRefresh() {
+      const refreshBtn = document.getElementById('forceRefreshBtn');
+
+      try {
+        // Disable button and show loading state
+        refreshBtn.disabled = true;
+        refreshBtn.classList.add('refreshing');
+        refreshBtn.textContent = '🔄 Refreshing...';
+
+        // Clear all caches
+        if ('caches' in window) {
+          const cacheNames = await caches.keys();
+          await Promise.all(
+            cacheNames.map(cacheName => {
+              console.log('Clearing cache:', cacheName);
+              return caches.delete(cacheName);
+            })
+          );
+        }
+
+        // Unregister service worker if present
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          await Promise.all(
+            registrations.map(registration => {
+              console.log('Unregistering service worker');
+              return registration.unregister();
+            })
+          );
+        }
+
+        // Clear localStorage (optional - preserves user data)
+        // localStorage.clear();
+
+        // Force reload from server (bypass cache)
+        window.location.reload(true);
+
+      } catch (error) {
+        console.error('Error during force refresh:', error);
+
+        // Reset button state on error
+        refreshBtn.disabled = false;
+        refreshBtn.classList.remove('refreshing');
+        refreshBtn.textContent = '🔄 Force Refresh';
+
+        // Fallback: just reload the page
+        window.location.reload();
+      }
+    }
+
+    // Register Service Worker for offline functionality
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('../../sw.js')
+          .then((registration) => {
+            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+          })
+          .catch((error) => {
+            console.log('ServiceWorker registration failed: ', error);
+          });
+      });
+    } else {
+      console.log('ServiceWorker is not supported in this browser.');
+    }
+
+    // Set up force refresh button
+    window.addEventListener('load', () => {
+      const forceRefreshBtn = document.getElementById('forceRefreshBtn');
+      if (forceRefreshBtn) {
+        forceRefreshBtn.addEventListener('click', forceRefresh);
+      }
+    });
+  </script>
+
+  <!-- Tool switcher / shell -->
+  <script type="module" src="/src/shell/shell.js"></script>
+</body>
+
+
+</html>
+

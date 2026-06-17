@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>GA Calculator New</title>
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, user-scalable=no, interactive-widget=resizes-content">
+    <meta name="theme-color" content="#007cba">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="ucal">
+    <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: auto;
+            position: relative;
+            min-height: 100vh;
+            /* Improve scroll behavior */
+            scroll-behavior: smooth;
+            /* Prevent scroll anchoring issues */
+            overflow-anchor: none;
+        }
+
+        input,
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        /* Mobile viewport fix for keyboard */
+        @media (max-width: 768px) {
+
+            html,
+            body {
+                height: 100vh;
+                height: 100dvh;
+                /* Dynamic viewport height */
+                overflow-x: hidden;
+                margin: 0;
+                padding: 0;
+                /* Fix smooth scrolling to top */
+                scroll-behavior: smooth;
+            }
+
+            body {
+                padding: 0;
+                /* Remove any potential scroll barriers */
+                position: relative;
+            }
+
+            .tab-container {
+                padding: 10px;
+                padding-bottom: 50px;
+                /* Ensure smooth scrolling within container */
+                scroll-behavior: smooth;
+            }
+
+            /* Add padding to tab buttons on mobile */
+            .tab-buttons {
+                padding-top: 29px;
+            }
+
+            .average-inputs {
+                margin: 10px 0;
+            }
+
+            .input-row {
+                margin: 5px 0;
+            }
+
+            input {
+                font-size: 16px;
+                /* Prevents zoom on iOS */
+                padding: 12px;
+            }
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        pre {
+            background: #f9f9f9;
+            padding: 10px;
+            white-space: pre-wrap;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .form-section {
+            flex: 1 1 300px;
+        }
+
+        .calendar-section {
+            flex: 1 1 300px;
+        }
+
+        #pregnancy-wheel-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: auto;
+        }
+
+        #pregnancy-wheel {
+            display: block;
+        }
+
+        /* Tab styles */
+        .tab-container {
+            margin-bottom: 20px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px;
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 0;
+        }
+
+        .tab-button.active {
+            background: #007cba;
+            color: white;
+        }
+
+        .tab-button:hover {
+            background: #e0e0e0;
+        }
+
+        .tab-button.active:hover {
+            background: #005a87;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+
+    <!-- Flatpickr CSS -->
+    <link rel="stylesheet" href="/vendor/flatpickr.min.css">
+
+</head>
+
+<body>
+    <!-- Tab Navigation -->
+    <div class="tab-container">
+        <!-- GA Calculator Tab (Only this tab will be visible) -->
+        <div id="ga-calculator" class="tab-content active">
+            <div class="container">
+                <div class="form-section">
+                    <h2>4-NewBox GA Calculator with LMP, EDC</h2>
+
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                        <div id="connection-status"
+                            style="padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 500;">
+                            &#128241; Checking...
+                        </div>
+                        <button onclick="toggleInstructions()"
+                            style="background: #f8f9fa; color: #6c757d; border: 1px solid #dee2e6; border-radius: 4px; width: 24px; height: 24px; font-size: 12px; cursor: pointer; padding: 0; display: inline-flex; align-items: center; justify-content: center;">
+                            ?
+                        </button>
+                    </div>
+
+                    <div id="instructions"
+                        style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 12px; border-radius: 6px; margin-bottom: 15px; display: none; font-size: 13px;">
+                        <h4 style="margin: 0 0 8px 0; color: #495057; font-size: 14px;">How to Use:</h4>
+                        <ul style="margin: 8px 0; padding-left: 18px; color: #6c757d;">
+                            <li><strong>LMP/EDC:</strong> Enter Last Menstrual Period or Expected Date of Confinement
+                                (optional)</li>
+                            <li><strong>Known Date/GA:</strong> Enter a date where you know the exact gestational age
+                            </li>
+                            <li><strong>Calculated Date/GA:</strong> Enter a date to calculate what the GA would be</li>
+                            <li><strong>Clear buttons:</strong> Use individual clear buttons to reset specific sections
+                            </li>
+                        </ul>
+                        <p style="margin: 8px 0 0 0; font-size: 12px; color: #868e96; font-style: italic;">Tip: You can
+                            mix and match any combination of inputs.</p>
+                    </div>
+
+                    <h3>LMP</h3>
+                    <input type="date" id="lmp" placeholder="LMP (optional)">
+
+                    <h3>EDC</h3>
+                    <input type="date" id="edc" placeholder="EDC (optional)">
+
+                    <button onclick="clearLmpEdc()"
+                        style="background: #6c757d; color: white; border: none; border-radius: 4px;">Clear LMP /
+                        EDC</button>
+
+                    <h3>Known Date / GA</h3>
+                    <input type="date" id="dateA" placeholder="Date A (known GA)">
+                    <input type="text" id="gaA" placeholder="GA on Date A (e.g. 10+3)">
+
+                    <button onclick="clearKnownDateGA()"
+                        style="background: #6c757d; color: white; border: none; border-radius: 4px;">Clear Known Date /
+                        GA</button>
+
+                    <h3>Calculated Date / GA</h3>
+                    <input type="date" id="dateB" placeholder="Date B (to find GA)">
+                    <input type="text" id="gaB" placeholder="GA on Date B (e.g. 12+0)">
+
+                    <button onclick="clearCalculatedDateGA()"
+                        style="background: #6c757d; color: white; border: none; border-radius: 4px;">Clear Calculated
+                        Date / GA</button>
+
+                    <button onclick="calculate()"
+                        style="background: #007cba; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: 500; padding: 12px;">Calculate</button>
+
+                    <pre id="output"></pre>
+                </div>
+
+                <div class="calendar-section">
+                    <h3>Calendar View</h3>
+                    <div id="calendar"></div>
+
+                    <h3>Pregnancy Wheel</h3>
+                    <div id="pregnancy-wheel-container">
+                        <svg id="pregnancy-wheel" width="400" height="400" viewBox="0 0 400 400">
+                            <!-- Outer circle -->
+                            <circle cx="200" cy="200" r="180" stroke="#333" stroke-width="2" fill="none"></circle>
+                            <!-- Inner circle (rotatable) -->
+                            <g id="inner-circle">
+                                <circle cx="200" cy="200" r="140" stroke="#666" stroke-width="2" fill="none"></circle>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="calculator.js"></script>
+
+    <script>
+        // Tab switching functionality - Navigate to unique URLs
+        function switchTab(tabId) {
+            if (tabId === 'ga-calculator') {
+                // Stay on current page since we're already on GA Calculator
+                return;
+            } else if (tabId === 'average-calculator') {
+                window.location.href = '../avg/avg.html';
+            } else if (tabId === 'settings') {
+                window.location.href = 'settings.html';
+            }
+        }
+
+        // Instructions toggle functionality
+        function toggleInstructions() {
+            const instructions = document.getElementById('instructions');
+            if (instructions.style.display === 'none') {
+                instructions.style.display = 'block';
+            } else {
+                instructions.style.display = 'none';
+            }
+        }
+
+        // Connection status functionality
+        function updateConnectionStatus() {
+            const statusElement = document.getElementById('connection-status');
+            if (navigator.onLine) {
+                statusElement.innerHTML = '&#128310; Currently Online';
+                statusElement.style.background = '#e8f5e8';
+                statusElement.style.color = '#2e7d2e';
+            } else {
+                statusElement.innerHTML = '&#128241; Currently Offline';
+                statusElement.style.background = '#fff3cd';
+                statusElement.style.color = '#856404';
+            }
+        }
+
+        // Update status on page load and when connection changes
+        document.addEventListener('DOMContentLoaded', updateConnectionStatus);
+        window.addEventListener('online', updateConnectionStatus);
+        window.addEventListener('offline', updateConnectionStatus);
+    </script>
+
+    <script>
+        const svg = document.getElementById("pregnancy-wheel");
+        const innerCircleGroup = document.getElementById("inner-circle");
+        const cx = 200,
+            cy = 200;
+
+        const daysInMonth = [31, 28, 31, 30, 31, 30,
+            31, 31, 30, 31, 30, 31
+        ];
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        ];
+
+        const totalDays = daysInMonth.reduce((a, b) => a + b, 0);
+
+
+
+
+
+
+        // ✅ 1️⃣ Inner circle: weeks + week ticks
+        for (let i = 0; i <= 40; i++) { // changed from 1..52 to 0..40
+            const angle = (i * 7 / 365) * 2 * Math.PI - Math.PI / 2; // 7 days per week mapped to 365 days
+
+            // Week number inside
+            const rx = cx + 120 * Math.cos(angle);
+            const ry = cy + 120 * Math.sin(angle);
+            const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            text.setAttribute("x", rx);
+            text.setAttribute("y", ry);
+            text.setAttribute("text-anchor", "middle");
+            text.setAttribute("dominant-baseline", "middle");
+            text.setAttribute("font-size", "10");
+            text.textContent = i;
+
+            // When creating each text, store its base angle:
+            text.dataset.baseAngle = angle; // radians
+            innerCircleGroup.appendChild(text);
+
+            // Week tick mark
+            // Longer tick for week 0 and week 40
+            // ✅ Inner circle week ticks — longer for 0 & 40, and red color for those
+            const weekTickLength = (i === 0 || i === 40) ? 30 : 5;
+            const tickColor = (i === 0 || i === 40) ? "red" : "#666";
+
+            const x1 = cx + 140 * Math.cos(angle);
+            const y1 = cy + 140 * Math.sin(angle);
+            const x2 = cx + (140 + weekTickLength) * Math.cos(angle);
+            const y2 = cy + (140 + weekTickLength) * Math.sin(angle);
+
+            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            line.setAttribute("x1", x1);
+            line.setAttribute("y1", y1);
+            line.setAttribute("x2", x2);
+            line.setAttribute("y2", y2);
+            line.setAttribute("stroke", tickColor);
+            line.setAttribute("stroke-width", 1);
+            innerCircleGroup.appendChild(line);
+        }
+
+        // ✅ 2️⃣ Outer circle: day ticks and day numbers
+        let dayOffset = 0;
+        let rawRotation = 0; // continuous, no snap
+        let snappedRotation = 0; // the last snapped value
+
+        daysInMonth.forEach((days, monthIndex) => {
+            for (let d = 1; d <= days; d++) {
+                const dayNumber = dayOffset + d;
+                const angle = (dayNumber / totalDays) * 2 * Math.PI - Math.PI / 2;
+
+                // Outer day tick: longer for multiples of 5, same width
+                const tickLength = d % 5 === 0 ? 15 : 10; // 15px for 5s, 10px otherwise
+                const x1 = cx + 145 * Math.cos(angle);
+                const y1 = cy + 145 * Math.sin(angle);
+                const x2 = cx + (145 + tickLength) * Math.cos(angle);
+                const y2 = cy + (145 + tickLength) * Math.sin(angle);
+
+                const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.setAttribute("x1", x1);
+                line.setAttribute("y1", y1);
+                line.setAttribute("x2", x2);
+                line.setAttribute("y2", y2);
+                line.setAttribute("stroke", "#000");
+                line.setAttribute("stroke-width", 1); // always thin
+                svg.appendChild(line);
+
+                // Day number every 5 days, placed a bit outside the tick
+                if (d % 5 === 0) {
+                    const tx = cx + 165 * Math.cos(angle);
+                    const ty = cy + 165 * Math.sin(angle);
+                    const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+                    text.setAttribute("x", tx);
+                    text.setAttribute("y", ty);
+                    text.setAttribute("text-anchor", "middle");
+                    text.setAttribute("dominant-baseline", "middle");
+                    text.setAttribute("font-size", "8");
+                    text.textContent = d;
+                    svg.appendChild(text);
+                }
+            }
+
+            // ✅ Draw line between months
+            const monthStartDay = dayOffset; // current offset before adding this month
+            const angle = (monthStartDay / totalDays) * 2 * Math.PI - Math.PI / 2;
+
+            const mx1 = cx + 155 * Math.cos(angle); // outer edge of day ticks
+            const my1 = cy + 155 * Math.sin(angle);
+            const mx2 = cx + 180 * Math.cos(angle); // reaches to the outer edge of month labels
+            const my2 = cy + 180 * Math.sin(angle);
+
+            const monthLine = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            monthLine.setAttribute("x1", mx1);
+            monthLine.setAttribute("y1", my1);
+            monthLine.setAttribute("x2", mx2);
+            monthLine.setAttribute("y2", my2);
+            monthLine.setAttribute("stroke", "#333");
+            monthLine.setAttribute("stroke-width", 2);
+            svg.appendChild(monthLine);
+
+            // ✅ Outer month names at the far rim
+            const monthStart = dayOffset;
+            const monthEnd = dayOffset + days;
+            const midDay = (monthStart + monthEnd) / 2;
+            const midAngle = (midDay / totalDays) * 2 * Math.PI - Math.PI / 2;
+            const mx = cx + 180 * Math.cos(midAngle);
+            const my = cy + 180 * Math.sin(midAngle);
+
+            const monthText = document.createElementNS("http://www.w3.org/2000/svg", "text");
+            monthText.setAttribute("x", mx);
+            monthText.setAttribute("y", my);
+            monthText.setAttribute("text-anchor", "middle");
+            monthText.setAttribute("dominant-baseline", "middle");
+            monthText.setAttribute("font-size", "10");
+            monthText.textContent = monthNames[monthIndex];
+            svg.appendChild(monthText);
+
+            dayOffset += days;
+        });
+        let isDragging = false;
+        let lastAngle = 0;
+
+        // Mouse events
+        svg.addEventListener("mousedown", startDrag);
+        svg.addEventListener("mousemove", drag);
+        svg.addEventListener("mouseup", endDrag);
+        svg.addEventListener("mouseleave", endDrag);
+
+        // Touch events
+        svg.addEventListener("touchstart", startDragTouch, { passive: false });
+        svg.addEventListener("touchmove", dragTouch, { passive: false });
+        svg.addEventListener("touchend", endDrag);
+
+        function getAngle(clientX, clientY) {
+            const rect = svg.getBoundingClientRect();
+            const x = clientX - rect.left - cx;
+            const y = clientY - rect.top - cy;
+            return Math.atan2(y, x);
+        }
+
+        function startDrag(event) {
+            isDragging = true;
+            lastAngle = getAngle(event.clientX, event.clientY);
+        }
+
+        function startDragTouch(event) {
+            if (event.touches.length === 1) {
+                isDragging = true;
+                lastAngle = getAngle(event.touches[0].clientX, event.touches[0].clientY);
+                event.preventDefault();
+            }
+        }
+
+        function drag(event) {
+            if (!isDragging) return;
+            const angle = getAngle(event.clientX, event.clientY);
+            const delta = angle - lastAngle;
+            lastAngle = angle;
+            rotateInner(delta);
+        }
+
+        function dragTouch(event) {
+            if (!isDragging || event.touches.length !== 1) return;
+            const angle = getAngle(event.touches[0].clientX, event.touches[0].clientY);
+            const delta = angle - lastAngle;
+            lastAngle = angle;
+            rotateInner(delta);
+            event.preventDefault();
+        }
+
+        function endDrag() {
+            isDragging = false;
+        }
+
+        function rotateInner(delta) {
+            const deltaDegrees = delta * 180 / Math.PI;
+            rawRotation += deltaDegrees;
+
+            const degreesPerWeek = (1 / 365) * 360;
+
+            // Snap only when crossing threshold
+            const newSnapped = Math.round(rawRotation / degreesPerWeek) * degreesPerWeek;
+
+            // Only update if changed
+            if (newSnapped !== snappedRotation) {
+                snappedRotation = newSnapped;
+                innerCircleGroup.setAttribute("transform", `rotate(${snappedRotation} ${cx} ${cy})`);
+
+                // Keep labels upright
+                const texts = innerCircleGroup.querySelectorAll("text");
+                texts.forEach(text => {
+                    const baseAngle = parseFloat(text.dataset.baseAngle);
+                    const x = cx + 120 * Math.cos(baseAngle);
+                    const y = cy + 120 * Math.sin(baseAngle);
+                    text.setAttribute("x", x);
+                    text.setAttribute("y", y);
+                    text.setAttribute("transform", `rotate(${-snappedRotation} ${x} ${y})`);
+                });
+            }
+        }
+
+    </script>
+
+
+    <!-- Tool switcher / shell -->
+    <script type="module" src="/src/shell/shell.js"></script>
+
+    <!-- Flatpickr JS (vendored for offline) -->
+    <script src="/vendor/flatpickr.js"></script>
+
+    <script>
+        // Inline calendar view (read-only)
+        flatpickr("#calendar", {
+            inline: true,
+            dateFormat: "Y-m-d",
+            defaultDate: new Date(),
+            disableMobile: true
+        });
+    </script>
+
+    <!-- End Credits -->
+    <footer
+        style="background: #f5f5f5; border-top: 2px solid #ddd; padding: 20px; text-align: center; margin-top: 50px;">
+        <div style="max-width: 600px; margin: 0 auto;">
+            <h3 style="color: #333; margin-bottom: 10px;">Credits</h3>
+            <p style="font-size: 16px; color: #666; margin: 10px 0;">
+                <strong>Created by:</strong> Ung MDKKU50
+            </p>
+            <p style="font-size: 14px; color: #666; margin: 10px 0;">
+                <strong>&#128241; This app works both online and offline</strong> - Save to your home screen for quick
+                access
+            </p>
+            <p style="font-size: 14px; color: #999; margin: 5px 0;">
+                <strong>&#9888; Disclaimer:</strong> Use at your own risk
+            </p>
+            <p style="font-size: 11px; color: #bbb; margin: 10px 0 0 0; font-style: italic;">
+                Originally created for personal use - bugs may exist. Use the Settings tab to report issues.
+            </p>
+        </div>
+    </footer>
+
+</body>
+
+</html>

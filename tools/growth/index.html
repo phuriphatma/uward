@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, maximum-scale=3.0">
+    <title>Growth Chart Plotter - Boys & Girls (2-19 years)</title>
+    <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 10px;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            max-width: 100%;
+        }
+        
+        .form-section {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-width: 280px;
+            flex: 1;
+            max-width: 100%;
+        }
+        
+        .chart-section {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            flex: 2;
+            max-width: 100%;
+            overflow: auto;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        /* Constrain numeric field width so they don't stretch excessively on wide screens */
+        .inline-clear-wrap input[type=number] {
+            max-width: 140px; /* prevents horizontal overflow look */
+        }
+        /* Age trio even narrower for readability */
+        .age-inputs .inline-clear-wrap input[type=number] {
+            max-width: 90px;
+        }
+        /* Allow full-width on small devices */
+        @media (max-width: 600px) {
+            .inline-clear-wrap input[type=number] { max-width: 100%; }
+        }
+        
+        .age-inputs {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .age-inputs input {
+            flex: 1;
+        }
+        
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        #chartContainer {
+            position: relative;
+            display: inline-block;
+            max-width: 100%;
+        }
+        
+        #chartCanvas {
+            border: 1px solid #ddd;
+            cursor: crosshair;
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .form-section, .chart-section {
+                flex: none;
+                width: 100%;
+            }
+            
+            body {
+                padding: 5px;
+            }
+            
+            h1 {
+                font-size: 1.5em;
+                margin-bottom: 15px;
+            }
+            
+            .age-inputs {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .form-section, .chart-section {
+                padding: 10px;
+                margin: 5px 0;
+            }
+            
+            input, select, button {
+                font-size: 16px; /* Prevents zoom on iOS */
+            }
+            
+            h1 {
+                font-size: 1.3em;
+            }
+            
+            h2 {
+                font-size: 1.1em;
+            }
+        }
+        
+        .calibration-item {
+            display: inline-block;
+            margin: 2px;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+        
+        .calibration-item.completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .calibration-item.current {
+            background-color: #fff3cd;
+            color: #856404;
+            font-weight: bold;
+        }
+        
+        .clickable-curve {
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .clickable-curve:hover {
+            background-color: #e2e6ea;
+            border-color: #adb5bd;
+        }
+        
+        .calibration-item.needs-recalibration {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .results {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        h2 {
+            color: #333;
+            margin-top: 0;
+        }
+        .tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+  gap: 8px;
+}
+
+.tab-btn {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  background: #e0e0e0;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.tab-btn.active {
+  background: #007bff;
+  color: white;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+        /* Unified percentile panel row grid so percentile column aligns vertically */
+        .pct-row { 
+            display: grid; 
+            grid-template-columns: 56px 78px auto; /* label | value | percentile */
+            align-items: center; 
+            gap: 6px; 
+        }
+        .pct-row .pct-pct { white-space: nowrap; }
+        /* Clear button styling */
+        .inline-clear-wrap { position: relative; }
+        .inline-clear-wrap input { padding-right: 26px; }
+        .clear-btn { position:absolute; top:50%; right:4px; transform:translateY(-50%); width:20px; height:20px; border:none; border-radius:50%; background:#e0e0e0; color:#444; font-size:14px; line-height:20px; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center; }
+        .clear-btn:hover { background:#d0d0d0; }
+        .age-inputs { gap:6px; }
+        .age-inputs .inline-clear-wrap { flex:1; }
+        @media (max-width: 768px){ .inline-clear-wrap input { padding-right:30px; } }
+    </style>
+</head>
+<body>
+    <div class="tabs">
+  <button class="tab-btn active" data-tab="growth">📈 Growth Charts</button>
+  <button class="tab-btn" data-tab="milestone">🧩 Development Milestones</button>
+</div>
+    <h1>Growth Chart Plotter</h1>
+    <div id="growth" class="tab-content active">
+    <div class="container">
+        <div class="form-section">
+            <h2>Enter Data</h2>
+            <form id="growthForm">
+                <div class="form-group">
+                    <label for="sexSelect">Sex:</label>
+                    <select id="sexSelect">
+                        <option value="Boy" selected>Boy</option>
+                        <option value="Girl">Girl</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="chartTypeSelect">Chart Type:</label>
+                    <select id="chartTypeSelect">
+                        <option value="age_2_19" selected>Age 2-19 Years</option>
+                        <option value="age_0_2">Age 0-2 Years</option>
+                        <option value="wfh">Weight-for-Height (2-19y)</option>
+                        <option value="hc">Head Circumference (0-5y)</option>
+                    </select>
+                </div>
+                <!-- Hidden combined key for legacy code paths -->
+                <input type="hidden" id="sex" value="Boy">
+                
+                <div class="form-group">
+                    <label>Age:</label>
+                    <div class="age-inputs">
+                        <div class="inline-clear-wrap">
+                            <input type="number" id="ageYears" placeholder="Years" min="0" max="19" class="narrow-number">
+                            <button type="button" class="clear-btn" title="Clear" data-clear-target="ageYears">×</button>
+                        </div>
+                        <div class="inline-clear-wrap">
+                            <input type="number" id="ageMonths" placeholder="Months" min="0" max="11" class="narrow-number">
+                            <button type="button" class="clear-btn" title="Clear" data-clear-target="ageMonths">×</button>
+                        </div>
+                        <div class="inline-clear-wrap">
+                            <input type="number" id="ageDays" placeholder="Days" min="0" max="30" class="narrow-number">
+                            <button type="button" class="clear-btn" title="Clear" data-clear-target="ageDays">×</button>
+                        </div>
+                    </div>
+                    <div style="margin-top:6px; display:flex; justify-content:flex-end;">
+                        <button type="button" id="clearAgeAllBtn" style="background:#bbb;color:#222;padding:6px 12px;font-size:12px;border-radius:6px;">Clear Age (All)</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="weight">Weight (kg):</label>
+                    <div class="inline-clear-wrap">
+                        <input type="number" id="weight" step="0.1" min="0" class="narrow-number">
+                        <button type="button" class="clear-btn" title="Clear" data-clear-target="weight">×</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="height">Height/Length (cm):</label>
+                    <div class="inline-clear-wrap">
+                        <input type="number" id="height" step="0.1" min="0" class="narrow-number">
+                        <button type="button" class="clear-btn" title="Clear" data-clear-target="height">×</button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="headCircumference">Head Circumference (cm):</label>
+                    <div class="inline-clear-wrap">
+                        <input type="number" id="headCircumference" step="0.1" min="0" class="narrow-number">
+                        <button type="button" class="clear-btn" title="Clear" data-clear-target="headCircumference">×</button>
+                    </div>
+                </div>
+                
+                <button type="button" id="multiPlotBtn" style="margin-top:8px;background:#6f42c1;">Analyze (All Charts)</button>
+            </form>
+            
+            <!-- Percentile Display Panel -->
+            <div id="percentilePanel" style="display:none; background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:#fff; padding:15px; border-radius:10px; margin-top:15px; box-shadow:0 4px 8px rgba(0,0,0,0.2);">
+                <h3 id="percentileHeader" style="margin:0 0 12px 0; text-align:center; font-size:18px;">📊 Percentile Analysis</h3>
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <div id="weightBox" class="pct-row">
+                        <div class="pct-label" style="font-size:12px; letter-spacing:0.5px;">WEIGHT</div>
+                        <div id="weightValueDisplay" class="pct-value" style="font-size:13px; text-align:center; background:rgba(255,255,255,0.08); padding:4px 6px; border-radius:4px;">-</div>
+                        <div id="weightPercentileDisplay" class="pct-pct" style="text-align:left; font-size:14px; font-weight:bold; background:rgba(255,255,255,0.15); padding:4px 8px; border-radius:6px;">-</div>
+                    </div>
+                    <div id="heightBox" class="pct-row">
+                        <div class="pct-label" style="font-size:12px; letter-spacing:0.5px;">HEIGHT</div>
+                        <div id="heightValueDisplay" class="pct-value" style="font-size:13px; text-align:center; background:rgba(255,255,255,0.08); padding:4px 6px; border-radius:4px;">-</div>
+                        <div id="heightPercentileDisplay" class="pct-pct" style="text-align:left; font-size:14px; font-weight:bold; background:rgba(255,255,255,0.15); padding:4px 8px; border-radius:6px;">-</div>
+                    </div>
+                    <div id="wfhBox" class="pct-row">
+                        <div class="pct-label" style="font-size:12px; letter-spacing:0.5px;">W/H</div>
+                        <div id="wfhValueDisplay" class="pct-value" style="font-size:13px; text-align:center; background:rgba(255,255,255,0.08); padding:4px 6px; border-radius:4px;">-</div>
+                        <div id="wfhPercentileDisplay" class="pct-pct" style="text-align:left; font-size:14px; font-weight:bold; background:rgba(255,255,255,0.15); padding:4px 8px; border-radius:6px;">-</div>
+                    </div>
+                    <div id="headBox" class="pct-row">
+                        <div class="pct-label" style="font-size:12px; letter-spacing:0.5px;">HC</div>
+                        <div id="headValueDisplay" class="pct-value" style="font-size:13px; text-align:center; background:rgba(255,255,255,0.08); padding:4px 6px; border-radius:4px;">-</div>
+                        <div id="headPercentileDisplay" class="pct-pct" style="text-align:left; font-size:14px; font-weight:bold; background:rgba(255,255,255,0.15); padding:4px 8px; border-radius:6px;">-</div>
+                    </div>
+                </div>
+                <div id="percentileDetails" style="margin-top:12px; font-size:11px; text-align:center; opacity:0.9;">Magnetic curves based percentile computation</div>
+            </div>
+
+            <div id="results" class="results" style="display: none;">
+                <h3>Results:</h3>
+                <div id="resultsContent"></div>
+            </div>
+        </div>
+        
+        <div class="chart-section">
+            <h2 style="margin-top:0;">All Charts</h2>
+            <div style="margin-bottom: 6px; font-size: 13px; color:#444;">Automatically generates every applicable chart (Age, W/H, HC) based on inputs.</div>
+            <div id="multiChartsContainer" style="margin-top:20px; display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:20px;">
+                <!-- Dynamic multiple charts will be injected here -->
+            </div>
+            <div id="analysisStatus" style="margin-top: 10px; font-size: 12px; color: #666;">
+                📈 Initializing computer vision analysis...
+            </div>
+        </div>
+    </div>
+    </div>
+<div id="milestone" class="tab-content">
+  <h2 style="text-align:center;">Development Milestones</h2>
+  <div style="display:flex;flex-direction:column;align-items:center;gap:15px;">
+         <img src="/tools/growth/IMG_5624.jpeg" alt="Milestone 1" style="max-width:100%;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.2);">
+    <img src="/tools/growth/IMG_5626.jpeg" alt="Milestone 2" style="max-width:100%;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.2);">
+ 
+  </div>
+</div>
+    <div style="text-align:center;margin-top:25px;font-size:11px;color:#666;letter-spacing:0.5px;">
+        Created by <strong>Ung MDKKU50</strong>
+    </div>
+
+    <script src="chart-analyzer.js"></script>
+    <script src="curve-calibration.js"></script>
+    <script src="script.js"></script>
+    <!-- Tool switcher / shell -->
+    <script type="module" src="/src/shell/shell.js"></script>
+</body>
+    <script>
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    // remove active states
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    document.querySelectorAll(".tab-content").forEach(tc => tc.classList.remove("active"));
+    
+    // activate clicked tab and content
+    btn.classList.add("active");
+    document.getElementById(btn.dataset.tab).classList.add("active");
+  });
+});
+</script>
+</html>

@@ -1,0 +1,52 @@
+/* Hub launcher — mobile-first. Tokens come from shell.css (imported first). */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--u-font);
+  background:
+    radial-gradient(1200px 480px at 50% -10%, #dbe7ff 0%, rgba(219, 231, 255, 0) 60%),
+    var(--u-bg);
+  color: var(--u-ink);
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+
+#hub { max-width: 760px; margin: 0 auto; padding: 28px 18px calc(40px + env(safe-area-inset-bottom)); }
+
+.hub-head { text-align: center; margin: 8px 0 26px; }
+.hub-brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 30px; letter-spacing: -.02em; }
+.hub-brand .mark {
+  width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center;
+  background: linear-gradient(135deg, var(--u-primary), #4f46e5); color: #fff; font-size: 22px;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, .35);
+}
+.hub-tagline { margin: 10px 0 0; color: var(--u-muted); font-size: 14px; }
+
+.ward { margin: 26px 0 0; }
+.ward-title { display: flex; align-items: center; gap: 8px; margin: 0 4px 12px; font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--u-faint); }
+.ward-title .w-ico { font-size: 16px; }
+
+.tool-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media (min-width: 560px) { .tool-grid { grid-template-columns: 1fr 1fr; } }
+
+.tool-card {
+  display: flex; align-items: center; gap: 14px;
+  padding: 16px; border-radius: var(--u-r-lg);
+  background: var(--u-surface); border: 1px solid var(--u-line);
+  box-shadow: var(--u-sh); text-decoration: none; color: inherit;
+  min-height: 72px; transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+}
+.tool-card:active { transform: translateY(1px) scale(.995); }
+@media (hover: hover) { .tool-card:hover { border-color: #cdddff; box-shadow: 0 8px 26px rgba(15, 23, 42, .10); } }
+.tool-card .t-ico {
+  flex: 0 0 auto; width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center;
+  font-size: 24px; background: var(--u-primary-tint); border: 1px solid #e0eaff;
+}
+.tool-card .t-name { font-weight: 700; font-size: 16px; }
+.tool-card .t-desc { font-size: 13px; color: var(--u-muted); margin-top: 2px; }
+.tool-card .t-go { margin-left: auto; color: var(--u-faint); font-size: 20px; }
+
+.hub-foot { margin: 34px 0 0; text-align: center; color: var(--u-faint); font-size: 12px; line-height: 1.7; }
+.hub-foot .pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: var(--u-surface); border: 1px solid var(--u-line); color: var(--u-muted); }
+.hub-foot .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--u-good); }
+.hub-foot code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }

@@ -1,0 +1,742 @@
+/* ===================================================================
+   Base layout + Quick-Note (#profilePage) editor styles
+   =================================================================== */
+#profilePage {
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateX(20px);}
+  to {opacity: 1; transform: translateX(0);}
+}
+
+*{box-sizing:border-box;font-family:'Inter',sans-serif}
+body,html{margin:0;padding:0;height:100%;overflow:hidden}
+#container{display:flex;height:100%;position:relative}
+
+/* Sidebar */
+#sidebar{width:250px;min-width:100px;max-width:80%;border-right:1px solid #ccc;
+display:flex;flex-direction:column;overflow:hidden}
+#sidebarHeader{display:flex;flex-direction:column;background:#fafafa;border-bottom:1px solid #ddd}
+#sidebarHeader button{width:100%;padding:12px;font-size:18px;background:#fff;border:none;
+border-bottom:1px solid #ddd;cursor:pointer}
+#sidebarHeader button#addWardBtn{border-bottom:none}
+#wardListContainer{flex:1;overflow-y:auto;padding:8px}
+#wardList{list-style:none;margin:0;padding:0}
+#wardList li{padding:6px;margin:4px 0;border-radius:4px;cursor:pointer;user-select:none;border:1px solid transparent}
+#wardList li.selected{background:#def}
+#wardList li.over{border:2px solid #007bff; background: rgba(0,123,255,0.15); box-shadow: inset 4px 0 0 #007bff, 0 0 8px rgba(0,123,255,0.3);}
+#wardList li{position:relative}
+#wardList li .ward-delete{position:absolute;right:6px;top:50%;transform:translateY(-50%);opacity:0;pointer-events:none;transition:opacity .15s;background:#fee;color:#900;border:1px solid #c00;border-radius:3px;padding:2px 6px;font-size:12px;line-height:1}
+body.edit-wards #wardList li .ward-delete{opacity:1;pointer-events:auto}
+.controls{margin-top:10px}
+
+/* Resizer */
+#resizer {
+  width: 8px;
+  cursor: col-resize;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* Main area */
+#main{flex:1;display:flex;flex-direction:row;overflow:hidden}
+#bedContainer{flex:1;padding:10px;overflow-y:auto;scroll-behavior:smooth;border-right:1px solid #eee}
+#bedList .bed-item{display:flex;flex-direction:row;align-items:center;gap:8px;border-bottom:1px solid #eee;padding:8px 0;cursor:grab;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;}
+#bedList .bed-item.select-mode{touch-action:none;-webkit-touch-callout:none;}
+body.dragging-bed{overflow:hidden;}
+#bedList .bed-item.over{border-top:3px solid #007bff;padding-top:5px}
+#bedList .bed-text{flex:1;display:flex;flex-direction:column;gap:4px}
+#bedList .bed-text .line1{font-weight:600;font-size:16px}
+#bedList .bed-text .line2{font-size:13px;color:#555}
+#bedList .actions-row{display:flex;gap:8px}
+#bedList .actions-row button{padding:6px 12px;border-radius:4px;cursor:pointer;border:1px solid #ccc;background:#fff}
+#bedList .actions-row .delete{border-color:#c00;background:#fee;color:#900}
+#bedList .bed-text .line2{white-space:pre-wrap}
+/* Bed selection mode */
+.bed-item.select-mode{cursor:default}
+.bed-item .select-box{margin-right:8px}
+.bed-item.selected{background:#f3f8ff}
+
+/* Status badge */
+.status-badge{margin-left:8px; font-size:11px; padding:2px 6px; border-radius:999px; border:1px solid transparent; vertical-align:middle;}
+.status-active{background:#e7ffe7; color:#056105; border-color:#bfe6bf}
+.status-discharge{background:#ffe7e7; color:#8a0000; border-color:#f0bcbc}
+
+
+/* Sheet table picking mode visuals */
+#sheetTableWrap.picking{outline:2px dashed #007bff; outline-offset:2px}
+#sheetTableWrap.picking th,#sheetTableWrap.picking td{cursor:crosshair}
+
+/* Add Bed button: larger and with spacing from list */
+#addBedBtn{display:block;width:100%;padding:12px 14px;font-size:16px;border-radius:8px;border:1px solid #ccc;background:#f7f7f7;margin:8px 0 16px;cursor:pointer}
+#addBedBtn:not(:disabled):hover{background:#f0f0f0}
+#addBedBtn:disabled{opacity:0.6;cursor:not-allowed}
+
+/* Quick I/O entry button (sidebar) */
+#sidebarHeader button#quickIOBtn{background:#007bff;color:#fff;font-weight:600;border-bottom:1px solid #006fe0;}
+#sidebarHeader button#quickIOBtn:hover{background:#006fe0;}
+
+/* Empty state shown when no ward is selected */
+.empty-state{text-align:center;padding:36px 16px;color:#666;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.empty-state .es-icon{font-size:40px;line-height:1;opacity:.85;}
+.empty-state .es-title{font-size:17px;font-weight:600;color:#333;margin:0;}
+.empty-state .quick-io-cta{display:inline-block;padding:14px 22px;font-size:16px;font-weight:600;background:#2563eb;color:#fff;border:none;border-radius:12px;cursor:pointer;box-shadow:0 8px 20px rgba(37,99,235,.28);}
+.empty-state .quick-io-cta:hover{background:#1d4ed8;}
+.empty-state .hint{font-size:13px;color:#999;margin:0;max-width:280px;}
+
+/* Profile panel */
+#profilePanel{width:360px;max-width:100%;padding:16px;overflow-y:auto;display:none;background:#f9fafb}
+#profilePanel.active{display:block}
+#profilePanel h2{margin-top:0}
+#profilePanel label{display:block;margin:8px 0;font-weight:600}
+#profilePanel input,#profilePanel textarea,#profilePanel select{
+  width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;font-size:14px}
+#profilePanel .row{display:flex;gap:8px;align-items:center}
+#profilePanel .row label{flex:1}
+
+/* Expand button */
+#expandSidebarBtn{position:absolute;left:0;top:50px;width:24px;height:32px;
+padding:0;line-height:32px;text-align:center;border:1px solid #ccc;background:#fff;
+border-radius:0 4px 4px 0;cursor:pointer;display:none;z-index:1000;font-size:18px}
+body.collapsed #sidebar,body.collapsed #resizer{display:none}
+/* Hide the sidebar indicator when collapsed */
+body.collapsed #expandSidebarBtn{display:none}
+
+
+/* Modal overlay */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+/* Modal content box */
+.modal-content {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  width: 90%;
+  max-width: 420px;
+  max-height: 90%;
+  overflow-y: auto;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+.modal h2 { margin-top: 0; }
+.modal label { display:block; margin:8px 0; font-weight:600; }
+.modal input, .modal textarea, .modal select {
+  width:100%; padding:9px 11px; border:1px solid #cbd5e1;
+  border-radius:9px; font-size:14px; color:#0f172a;
+}
+.modal input:focus, .modal textarea:focus, .modal select:focus{
+  outline:none; border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,.15);
+}
+.modal .actions {
+  margin-top:16px; display:flex; justify-content:flex-end; gap:8px;
+}
+.modal button {
+  padding:9px 14px; border-radius:9px; cursor:pointer; font-weight:500;
+  border:1px solid #cbd5e1; background:#fff; color:#334155;
+}
+.modal button:hover{ background:#f8fafc; }
+.modal button.save-btn {
+  background:#2563eb; color:white; border-color:#2563eb;
+}
+.modal button.save-btn:hover{ background:#1d4ed8; border-color:#1d4ed8; }
+/* Google Sheet import: stepped sections */
+.sheet-step{ border:1px solid #eee; border-radius:10px; padding:12px; background:#fafbfc; }
+.sheet-step-title{ font-weight:700; font-size:14px; color:#1a2a44; margin-bottom:6px; }
+.sheet-step .row{ flex-wrap:wrap; }
+  /* Notify editor (scoped to #profilePage) */
+  #profilePage {
+    --bg: #0b1020;
+    --card: #12182b;
+    --text: #e8ecf1;
+    --muted: #a9b2c0;
+    --accent: #5b9cff;
+    --good: #3ecf8e;
+    --bad: #ff6b6b;
+    --border: #22304a;
+    color: var(--text);
+    background: radial-gradient(1200px 800px at 80% -10%, #1a2652 0%, rgba(26,38,82,0) 60%), var(--bg);
+  }
+  #profilePage .layout { display: grid; grid-template-columns: 1fr; gap: 16px; }
+  #profilePage .col { min-width: 0; }
+  #profilePage header { padding: 0 0 8px; }
+  #profilePage header h1 { margin: 0 0 4px; font-size: 22px; font-weight: 600; display:inline-flex; align-items:center; gap:8px; }
+  #profilePage header .sub { color: var(--muted); font-size: 13px; }
+  /* Header status select styled as pill with color */
+  #profilePage #headerStatusSelect { appearance:none; -webkit-appearance:none; border-radius:999px; padding:4px 10px; font-size:12px; line-height:1.4; border:1px solid #1e2a44; background:#0f1527; color: var(--text); }
+  #profilePage #headerStatusSelect.status-active { background:#e7ffe7; color:#056105; border-color:#bfe6bf; }
+  #profilePage #headerStatusSelect.status-discharge { background:#ffe7e7; color:#8a0000; border-color:#f0bcbc; }
+  #profilePage main { max-width: 920px; margin: 0 auto 20px; padding: 0; }
+  #profilePage .card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.00));
+    border: 1px solid var(--border);
+    border-radius: 14px; padding: 16px; margin: 16px 0;
+  }
+  #profilePage .card h2 { margin: 0 0 10px; font-size: 16px; font-weight: 600; }
+  #profilePage label { display: block; font-size: 13px; color: var(--muted); margin: 8px 12px 8px 0; }
+  #profilePage select { width: 100%; margin-top: 6px; padding: 10px 12px; border-radius: 10px; background: #0f1527; color: var(--text); border: 1px solid #1e2a44; }
+  #profilePage input, #profilePage textarea {
+    width: 100%; margin-top: 6px; padding: 10px 12px; border-radius: 10px;
+    background: #0f1527; color: var(--text); border: 1px solid #1e2a44; outline: none;
+  }
+  #profilePage textarea#hashtags { min-height: 160px; }
+  #profilePage textarea#cli { min-height: 220px; }
+  #profilePage textarea#mx { min-height: 100px; }
+  #profilePage input:focus, #profilePage textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(91,156,255,0.15); }
+  #profilePage .row { display: flex; gap: 12px; align-items: center; }
+  #profilePage .row.between { justify-content: space-between; }
+  #profilePage .grid.vs { display: grid; grid-template-columns: repeat(5, minmax(80px, 1fr)); gap: 12px; }
+  #profilePage .tag { font-weight: 600; color: var(--muted); }
+  #profilePage .add { background: #183157; color: #dbe7ff; border: 1px solid #274a86; }
+  #profilePage button {
+    appearance: none; border: 1px solid var(--border); background: #131b31; color: var(--text);
+    padding: 10px 14px; border-radius: 10px; cursor: pointer; font-weight: 600;
+  }
+  #profilePage button.ghost { background: transparent; color: var(--muted); }
+  #profilePage button:active { transform: translateY(1px); }
+  #profilePage .io-line { 
+    display: grid; 
+    grid-template-columns: auto auto 1fr 160px 110px; 
+    grid-template-rows: auto auto;
+    gap: 10px; 
+    align-items: center; 
+    margin: 6px 0;
+    padding: 8px;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    background: rgba(0,0,0,0.2);
+    position: relative;
+    transition: all 0.2s;
+  }
+  #profilePage .io-line.dragging {
+    opacity: 0.5;
+    background: rgba(91,156,255,0.2);
+    border-color: rgba(91,156,255,0.5);
+    transform: scale(1.02);
+  }
+  #profilePage .lines.in,
+  #profilePage .lines.out {
+    min-height: 50px;
+    transition: background 0.2s;
+  }
+  #profilePage .lines.in:has(.dragging),
+  #profilePage .lines.out:has(.dragging) {
+    background: rgba(91,156,255,0.05);
+    border-radius: 8px;
+  }
+  #profilePage .io-line .drag-handle {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    cursor: grab;
+    color: #999;
+    font-size: 16px;
+    padding: 4px;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+  }
+  #profilePage .io-line:hover .drag-handle {
+    color: #5b9cff;
+  }
+  #profilePage .io-line .drag-handle:active {
+    cursor: grabbing;
+    color: #3d7fd8;
+  }
+  #profilePage .io-line .remove {
+    grid-column: 2;
+    grid-row: 1;
+    background: transparent; 
+    border: 1px solid rgba(255,100,100,0.3); 
+    color: #ff6b6b; 
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 0;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+  /* Hide delete buttons on mobile by default */
+  @media (max-width: 720px) {
+    #profilePage .io-line .remove {
+      display: none !important;
+    }
+    #profilePage .io-block.editing .io-line .remove {
+      display: flex !important;
+      position: relative;
+      z-index: 10;
+    }
+    /* Ensure the drag handle doesn't hide the remove button */
+    #profilePage .io-block.editing .io-line .drag-handle {
+      opacity: 0.3;
+    }
+  }
+  #profilePage .io-line .remove:hover {
+    background: rgba(255,100,100,0.15);
+    border-color: #ff6b6b;
+    transform: scale(1.1);
+  }
+  #profilePage .io-line .kind-wrapper { 
+    grid-column: 3;
+    grid-row: 1;
+    width: 100%; 
+  }
+  #profilePage .io-line input.kind { width: 100%; }
+  #profilePage .io-line textarea.kind { 
+    width: 100%; 
+    min-height: 38px;
+    line-height: 1.4;
+    font-family: inherit;
+  }
+  #profilePage .io-line input.display { 
+    grid-column: 4;
+    grid-row: 1;
+    width: 100%; 
+  }
+  #profilePage .io-line textarea.display { 
+    grid-column: 4;
+    grid-row: 1;
+    width: 100%; 
+    min-height: 38px;
+    line-height: 1.4;
+    font-family: inherit;
+  }
+  #profilePage .io-line input.amount { 
+    grid-column: 5;
+    grid-row: 1;
+    width: 100%; 
+  }
+  #profilePage .io-line textarea.amount { 
+    grid-column: 5;
+    grid-row: 1;
+    width: 100%; 
+    min-height: 38px;
+    line-height: 1.4;
+    font-family: inherit;
+  }
+  #profilePage .totals { margin-top: 8px; color: var(--muted); font-size: 13px; }
+  #profilePage .totals .net { color: var(--good); }
+  #profilePage .totals .neg { color: var(--bad); }
+  #profilePage .override { margin: 8px 0; padding: 8px; border: 1px dashed #2a3a5a; border-radius: 10px; background: rgba(20,30,55,0.4); }
+  #profilePage .override .row label { flex: 1; }
+  #profilePage .actions { display: flex; gap: 10px; justify-content: flex-end; margin: 20px 0; }
+  #profilePage .preview { background: #0d1427; border: 1px dashed #22304a; border-radius: 12px; padding: 14px; white-space: pre-wrap; min-height: 140px; }
+  #profilePage .io-card.morning { border-color: rgba(91,156,255,0.55); box-shadow: 0 0 0 1px rgba(91,156,255,0.10) inset; }
+  #profilePage .io-card.morning h2 { color: #bcd6ff; }
+  #profilePage .io-card.afternoon { border-color: rgba(62,207,142,0.55); box-shadow: 0 0 0 1px rgba(62,207,142,0.10) inset; }
+  #profilePage .io-card.afternoon h2 { color: #baf3d2; }
+  @media (max-width: 720px) { #profilePage .grid.vs { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 720px) {
+    #profilePage .io-line { 
+      grid-template-columns: 20px 1fr 90px; 
+      grid-template-rows: auto auto;
+      gap: 6px;
+      padding: 6px;
+    }
+    #profilePage .io-line .drag-handle {
+      grid-column: 1;
+      grid-row: 1 / -1;
+      font-size: 14px;
+    }
+    #profilePage .io-line .remove {
+      grid-column: 3;
+      grid-row: 1;
+      justify-self: end;
+      width: 28px;
+      height: 28px;
+      margin: 0;
+      flex-shrink: 0;
+    }
+    #profilePage .io-line .kind-wrapper { 
+      grid-column: 2 / 3; 
+      grid-row: 1;
+    }
+    #profilePage .io-line input.kind,
+    #profilePage .io-line textarea.kind,
+    #profilePage .io-line input.display,
+    #profilePage .io-line textarea.display,
+    #profilePage .io-line input.amount,
+    #profilePage .io-line textarea.amount {
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    #profilePage .io-line input.display,
+    #profilePage .io-line textarea.display { 
+      grid-column: 2 / 3; 
+      grid-row: 2;
+    }
+    #profilePage .io-line input.amount,
+    #profilePage .io-line textarea.amount { 
+      grid-column: 3 / 4; 
+      grid-row: 2;
+      width: 100%;
+    }
+  }
+
+  /* Mobile sticky preview bottom sheet (scoped) */
+  #profilePage .mobile-preview-sheet {
+    position: fixed; left: 250px; right: 0; bottom: 0; height: 50vh;
+    background: #0d1427; border-top: 1px solid var(--border);
+    box-shadow: 0 -12px 30px rgba(0,0,0,0.35);
+    transform: translateY(100%);
+    transition: transform 0.25s ease; z-index: 1002;
+    display: flex; flex-direction: column; will-change: height, transform; backface-visibility: hidden; -webkit-font-smoothing: antialiased;
+  }
+  body.collapsed #profilePage .mobile-preview-sheet { left: 0; }
+  #profilePage .mobile-preview-sheet.open { transform: translateY(0); }
+  #profilePage .mobile-preview-sheet .sheet-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  #profilePage .mobile-preview-sheet .sheet-header .grabber{ width: 42px; height: 6px; background: #2a3a5a; border-radius: 3px; margin-right: 8px; cursor: ns-resize; }
+  #profilePage .mobile-preview-sheet .title { font-weight: 600; color: var(--muted); }
+  #profilePage .mobile-preview-sheet .sheet-actions { display: flex; gap: 8px; }
+  #profilePage .mobile-preview-sheet .sheet-body { padding: 10px 12px; overflow: auto; display:flex; min-height: 0; backface-visibility: hidden; transform: translateZ(0); }
+  #profilePage .fab-preview { position: fixed; right: 16px; bottom: 16px; z-index: 1003; padding: 10px 14px; background: var(--accent); border: 0; color: #03122b; font-weight: 700; border-radius: 22px; box-shadow: 0 6px 18px rgba(0,0,0,0.35); }
+  #profilePage .fab-reset { position: fixed; left: 280px; bottom: 16px; z-index: 1003; padding: 10px 14px; background: #ff7676; border: 0; color: #2b0202; font-weight: 700; border-radius: 22px; box-shadow: 0 6px 18px rgba(0,0,0,0.35); }
+  body.collapsed #profilePage .fab-reset { left: 16px; }
+  #profilePage pre.preview{ flex:1; min-height: 0; backface-visibility: hidden; transform: translateZ(0); }
+  /* Make the built-in back button stick with the Quick Ward Note content */
+  #profilePage #backToBedsBtn{ position: sticky; top: 12px; align-self: flex-start; z-index: 3; }
+  @media (max-width: 979px){
+    #profilePage .mobile-preview-sheet { left: 0 !important; }
+    #profilePage .fab-reset { left: 16px; }
+  }
+  /* Phone positioning for the profile panel now lives with the modern-ui rules
+     (search "Phone / small-tablet (the slide-over range)") so it can override the
+     desktop popover rule cleanly. */
+
+
+/* ===================================================================
+   WardWork mobile-friendly tweaks
+   =================================================================== */
+/* WardWork mobile-friendly tweaks */
+  #wardWorkPage .row input,
+  #wardWorkPage .row select,
+  #wardWorkPage .row button { min-height: 36px; }
+  @media (max-width: 640px){
+    #wardWorkPage .row{ flex-direction: column; align-items: stretch !important; }
+    #wardWorkPage .row > label{ width:100%; }
+    #wardWorkPage .row input,
+    #wardWorkPage .row select,
+    #wardWorkPage .row button{ width:100% !important; }
+    #wardWorkPage .row .save-btn{ width:100% !important; }
+  }
+  /* WardWork mobile preview bottom sheet */
+  #wardWorkPage .mobile-preview-sheet {
+    position: fixed; left: 250px; right: 0; bottom: 0; height: 45vh;
+    background: #0d1427; color:#e8ecf1; border-top: 1px solid #22304a;
+    box-shadow: 0 -12px 30px rgba(0,0,0,0.35);
+    transform: translateY(100%);
+    transition: transform 0.25s ease; z-index: 1002;
+    display: flex; flex-direction: column; will-change: height, transform;
+  }
+  body.collapsed #wardWorkPage .mobile-preview-sheet { left: 0; }
+  #wardWorkPage .mobile-preview-sheet.open { transform: translateY(0); }
+  #wardWorkPage .mobile-preview-sheet .sheet-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; border-bottom: 1px solid #22304a; }
+  #wardWorkPage .mobile-preview-sheet .sheet-header .grabber{ width: 42px; height: 6px; background: #2a3a5a; border-radius: 3px; margin-right: 8px; cursor: ns-resize; }
+  #wardWorkPage .mobile-preview-sheet .title { font-weight: 600; color: #a9b2c0; }
+  #wardWorkPage .mobile-preview-sheet .sheet-actions { display: flex; gap: 8px; }
+  #wardWorkPage .mobile-preview-sheet .sheet-body { padding: 10px 12px; overflow: auto; display:flex; min-height: 0; }
+  #wardWorkPage .fab-preview { position: fixed; right: 16px; bottom: 16px; z-index: 1003; padding: 10px 14px; background: #5b9cff; border: 0; color: #03122b; font-weight: 700; border-radius: 22px; box-shadow: 0 6px 18px rgba(0,0,0,0.35); }
+  @media (max-width: 979px){ #wardWorkPage .mobile-preview-sheet { left: 0 !important; } }
+  /* WardWork: hide native datalist dropdown arrow on text inputs (keep our custom ▾ buttons) */
+  #wardWorkPage input[list]{ -webkit-appearance: none; -moz-appearance: none; appearance: none; background-image: none !important; }
+  #wardWorkPage input[list]::-webkit-calendar-picker-indicator{ display:none !important; opacity:0 !important; }
+  #wardWorkPage input.wwWard::-webkit-calendar-picker-indicator,
+  #wardWorkPage input.wwBed::-webkit-calendar-picker-indicator{ display:none !important; opacity:0 !important; }
+  #wardWorkPage .ww-block-handle{ cursor:grab; font-size:18px; padding:4px 6px; color:#666; user-select:none; }
+  #wardWorkPage .ww-block-handle:active{ cursor:grabbing; }
+  #wardWorkPage .ww-task-handle{ cursor:grab; user-select:none; }
+  #wardWorkPage .ww-task-handle:active{ cursor:grabbing; }
+
+
+/* ===================================================================
+   Modern clinical UI refresh (loaded last so it refines the blocks above)
+   =================================================================== */
+:root{
+    --bg:#eef2f7; --surface:#ffffff; --surface-2:#f8fafc;
+    --ink:#0f172a; --ink-2:#334155; --muted:#64748b; --faint:#94a3b8;
+    --line:#e6eaf0; --line-2:#cbd5e1;
+    --primary:#2563eb; --primary-700:#1d4ed8; --primary-tint:#eff6ff;
+    --good:#15803d; --good-tint:#dcfce7; --good-line:#bbf7d0;
+    --bad:#b91c1c; --bad-tint:#fee2e2; --bad-line:#fecaca;
+    --r:10px; --r-lg:14px; --r-xl:18px;
+    --sh-sm:0 1px 2px rgba(15,23,42,.06);
+    --sh:0 6px 20px rgba(15,23,42,.08);
+    --sh-lg:0 18px 44px rgba(15,23,42,.18);
+  }
+  html,body{ background:var(--bg); color:var(--ink); -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
+  ::selection{ background:rgba(37,99,235,.18); }
+  /* Tidy scrollbars on the light shell */
+  #wardListContainer::-webkit-scrollbar,#bedContainer::-webkit-scrollbar{ width:10px; }
+  #wardListContainer::-webkit-scrollbar-thumb,#bedContainer::-webkit-scrollbar-thumb{ background:#d3dae3; border-radius:8px; border:2px solid var(--surface); }
+  :focus-visible{ outline:2px solid var(--primary); outline-offset:2px; border-radius:6px; }
+
+  /* ---------- Reusable button system (light shell) ---------- */
+  .btn{ display:inline-flex; align-items:center; justify-content:center; gap:8px; font-family:inherit; font-size:14px;
+    font-weight:600; line-height:1.1; border-radius:var(--r); border:1px solid var(--line-2); background:var(--surface);
+    color:var(--ink-2); padding:10px 14px; cursor:pointer; transition:background .15s,border-color .15s,box-shadow .15s,transform .04s; }
+  .btn:hover{ background:var(--surface-2); }
+  .btn:active{ transform:translateY(1px); }
+  .btn-block{ width:100%; }
+  .btn-primary{ background:var(--primary); border-color:var(--primary); color:#fff; box-shadow:var(--sh-sm); }
+  .btn-primary:hover{ background:var(--primary-700); border-color:var(--primary-700); }
+  .btn-ghost{ background:transparent; border-color:transparent; color:var(--muted); }
+  .btn-ghost:hover{ background:var(--surface-2); color:var(--ink-2); }
+  .btn-danger{ background:var(--bad-tint); border-color:var(--bad-line); color:var(--bad); }
+  .btn-danger:hover{ background:#fdd; }
+  .btn-sm{ padding:7px 11px; font-size:13px; }
+
+  /* ---------- Sidebar shell ---------- */
+  #sidebar{ width:264px; background:var(--surface); border-right:1px solid var(--line); }
+  #sidebarHeader{ background:var(--surface); border-bottom:1px solid var(--line); padding:14px 12px 12px; gap:8px; }
+  /* neutralise the old blanket "#sidebarHeader button" look */
+  #sidebarHeader button{ width:auto; padding:initial; font-size:14px; background:none; border:none; border-bottom:none; cursor:pointer; }
+
+  .brand{ display:flex; align-items:center; gap:10px; padding:0 2px 8px; }
+  .brand-mark{ width:30px; height:30px; border-radius:9px; background:linear-gradient(135deg,#3b82f6,#1d4ed8); color:#fff;
+    display:grid; place-items:center; font-size:17px; font-weight:700; box-shadow:var(--sh-sm); flex:0 0 auto; }
+  .brand-name{ font-weight:700; font-size:15px; letter-spacing:-0.01em; color:var(--ink); }
+
+  #quickIOBtn{ width:100%; padding:11px 14px; border-radius:var(--r); background:var(--primary); color:#fff;
+    font-size:14.5px; font-weight:600; box-shadow:0 4px 12px rgba(37,99,235,.28); }
+  #quickIOBtn:hover{ background:var(--primary-700); }
+
+  /* Sidebar nav: clear, tappable rows with an icon chip (not a plain text list) */
+  .side-nav{ display:flex; flex-direction:column; gap:6px; margin-top:6px; }
+  .side-nav button{ display:flex; align-items:center; gap:12px; width:100%; text-align:left; justify-content:flex-start;
+    min-height:48px; padding:8px 12px; border-radius:12px; border:1px solid var(--line-2); background:#fff;
+    font-size:15px; font-weight:600; color:var(--ink); box-shadow:var(--sh-sm); }
+  .side-nav button:hover{ background:var(--surface-2); border-color:#94a3b8; }
+  .side-nav button:active{ transform:translateY(1px); }
+  .side-nav .nav-ico{ width:32px; height:32px; flex:0 0 auto; display:grid; place-items:center; border-radius:9px;
+    background:var(--primary-tint); border:1px solid #dbe7ff; font-size:16px; line-height:1; }
+
+  /* Profile selector chip + its popover */
+  .profiles-menu{ position:relative; margin-top:8px; }
+  #sidebarHeader #profileMenuBtn{ width:100%; display:flex; align-items:center; gap:8px; min-height:48px; padding:10px 14px; border:1px solid var(--line);
+    border-radius:12px; background:var(--surface-2); color:var(--ink); font-size:14px; }
+  #sidebarHeader #profileMenuBtn:hover{ border-color:var(--line-2); background:#fff; }
+  #profileMenuBtn .chip-eyebrow{ font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); }
+  #profileMenuBtn .chip-name{ font-weight:700; color:var(--ink); margin-left:2px; font-size:15px; }
+  #profileMenuBtn .chip-caret{ margin-left:auto; color:var(--muted); font-size:14px; }
+
+  /* All three header popovers: modern card + never clipped */
+  #profileMenuPanel,#wwProfileMenuPanel,#notesProfileMenuPanel{
+    border:1px solid var(--line) !important; border-radius:var(--r-lg) !important; box-shadow:var(--sh-lg) !important;
+    overflow:hidden !important; padding:0 !important; }
+  /* Desktop: the profile popover sits just under the Profile button in the sidebar. */
+  @media (min-width:769px){
+    #profileMenuPanel{ left:8px !important; right:8px !important; width:auto !important; top:calc(100% + 6px) !important; }
+  }
+  /* Phone / small-tablet (the slide-over range): the profile panel is a fixed
+     sheet near the top of the viewport. JS reparents it to <body> on open so the
+     sidebar's slide-over transform can't drag it off-screen. */
+  @media (max-width:768px){
+    #profileMenuPanel{ position:fixed !important; left:12px !important; right:12px !important;
+      top:12px !important; bottom:auto !important; width:auto !important; max-width:none !important;
+      max-height:80vh !important; z-index:1600 !important; }
+    #profileMenuBackdrop{ position:fixed; inset:0; background:rgba(15,23,42,.45); z-index:1590; }
+  }
+  #profileList li,#wwProfileList li,#notesProfileList li{ padding:9px 14px; cursor:pointer; font-size:14px; }
+  #profileList li:hover,#wwProfileList li:hover,#notesProfileList li:hover{ background:var(--surface-2); }
+  /* Popover footer action buttons */
+  #profileMenuPanel button:not(.ghost),#wwProfileMenuPanel button:not(.ghost),#notesProfileMenuPanel button:not(.ghost){
+    padding:7px 11px; border:1px solid var(--line-2); border-radius:8px; background:var(--surface); color:var(--ink-2);
+    font-size:13px; font-weight:500; cursor:pointer; }
+  #profileMenuPanel button:not(.ghost):hover,#wwProfileMenuPanel button:not(.ghost):hover,#notesProfileMenuPanel button:not(.ghost):hover{ background:var(--surface-2); border-color:var(--line-2); }
+  #profileMenuPanel button.delete,#wwProfileMenuPanel button.delete,#notesProfileMenuPanel button.delete{
+    background:var(--bad-tint); border-color:var(--bad-line); color:var(--bad); }
+  #closeProfilePanel,#wwCloseProfilePanel,#notesCloseProfilePanel{ border:none; background:none; font-size:20px; line-height:1; color:var(--muted); cursor:pointer; padding:0 4px; }
+
+  /* ---------- Ward list ---------- */
+  #wardListContainer{ padding:10px; }
+  #wardListPrefs{ color:var(--muted) !important; padding:6px 4px 8px !important; }
+  .ward-list-head{ display:flex; align-items:center; justify-content:space-between; padding:2px 4px 6px; }
+  .ward-list-head .wl-title{ font-size:11px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--faint); }
+  .ward-list-head .wl-tools{ display:flex; gap:4px; }
+  .ward-list-head .wl-tools button{ width:28px; height:28px; display:grid; place-items:center; border:1px solid var(--line);
+    border-radius:8px; background:var(--surface); color:var(--ink-2); font-size:15px; cursor:pointer; padding:0; }
+  .ward-list-head .wl-tools button:hover{ background:var(--surface-2); border-color:var(--line-2); }
+  body.edit-wards #editWardsBtn{ background:var(--primary-tint); border-color:var(--primary); color:var(--primary); }
+
+  #wardList li{ display:flex; align-items:center; gap:8px; padding:9px 10px 9px 12px; margin:3px 0; border-radius:10px;
+    border:1px solid transparent; box-shadow:inset 3px 0 0 var(--line-2); font-size:14px; color:var(--ink-2); }
+  #wardList li:hover{ background:var(--surface-2); }
+  #wardList li.selected{ background:var(--primary-tint); color:var(--primary-700); font-weight:600; box-shadow:inset 3px 0 0 var(--primary); }
+  #wardList li .wl-name{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  #wardList li .wl-count{ flex:0 0 auto; font-size:12px; font-weight:600; color:var(--muted);
+    background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:1px 8px; }
+  #wardList li.selected .wl-count{ background:#fff; border-color:var(--primary-line,#bfdbfe); color:var(--primary-700); }
+  #wardList li.has-beds .wl-count{ color:var(--good); }
+  body.edit-wards #wardList li .wl-count{ visibility:hidden; }
+
+  .controls{ display:flex; gap:8px; padding:10px 2px 4px; border-top:1px solid var(--line); margin-top:8px; }
+  .controls button{ flex:1; padding:8px 10px; border:1px solid var(--line); border-radius:8px; background:var(--surface);
+    color:var(--ink-2); font-size:13px; font-weight:500; cursor:pointer; }
+  .controls button:hover{ background:var(--surface-2); }
+
+  /* ---------- Bed container (patient list) ---------- */
+  #bedContainer{ padding:20px 22px; }
+  .bed-head{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+  #wardTitle{ margin:0; font-size:22px; font-weight:700; letter-spacing:-0.02em; color:var(--ink); }
+  .bed-toolbar{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:14px; }
+  .status-filter{ display:flex; align-items:center; gap:6px; margin-left:auto; font-size:13px; color:var(--muted); }
+  .status-filter select{ padding:7px 28px 7px 10px; border:1px solid var(--line-2); border-radius:8px; background:var(--surface);
+    color:var(--ink); font-size:13px; font-weight:500; }
+  #addBedBtn{ width:auto; display:inline-flex; align-items:center; gap:6px; margin:0; padding:10px 16px; border-radius:var(--r);
+    background:var(--primary); border:1px solid var(--primary); color:#fff; font-weight:600; box-shadow:var(--sh-sm); }
+  #addBedBtn:not(:disabled):hover{ background:var(--primary-700); }
+  #addBedBtn:disabled{ background:var(--surface-2); border-color:var(--line); color:var(--faint); box-shadow:none; }
+
+  /* Patient cards */
+  #bedList{ display:flex; flex-direction:column; gap:10px; }
+  #bedList .bed-item{ border:1px solid var(--line); border-left:4px solid var(--good); border-radius:var(--r-lg);
+    background:var(--surface); padding:14px 16px; box-shadow:var(--sh-sm); transition:box-shadow .15s,border-color .15s,transform .05s; }
+  #bedList .bed-item:hover{ box-shadow:var(--sh); }
+  #bedList .bed-item.is-discharge{ border-left-color:var(--bad); background:var(--surface-2); }
+  #bedList .bed-text .line1{ font-size:15.5px; font-weight:600; color:var(--ink); }
+  #bedList .bed-text .line2{ font-size:13px; color:var(--muted); margin-top:3px; }
+  .status-badge{ margin-left:8px; font-size:11px; font-weight:600; padding:2px 9px; border-radius:999px; }
+  .status-active{ background:var(--good-tint); color:var(--good); border:1px solid var(--good-line); }
+  .status-discharge{ background:var(--bad-tint); color:var(--bad); border:1px solid var(--bad-line); }
+  #bedList .actions-row{ gap:6px; }
+  #bedList .actions-row button{ padding:6px 12px; border-radius:8px; border:1px solid var(--line-2); background:var(--surface);
+    color:var(--ink-2); font-size:13px; font-weight:500; }
+  #bedList .actions-row button:hover{ background:var(--surface-2); }
+  #bedList .actions-row .delete{ border-color:var(--bad-line); background:var(--bad-tint); color:var(--bad); }
+  /* Reveal row actions on hover for a calmer list (desktop only) */
+  @media (hover:hover) and (min-width:980px){
+    #bedList .bed-item:not(.select-mode) .actions-row{ opacity:0; transition:opacity .15s; }
+    #bedList .bed-item:not(.select-mode):hover .actions-row,
+    #bedList .bed-item:not(.select-mode):focus-within .actions-row{ opacity:1; }
+  }
+  #bedList .bed-item.selected{ border-color:var(--primary); box-shadow:0 0 0 3px rgba(37,99,235,.12); background:var(--primary-tint); }
+
+  /* ---------- Light cards (WardWork / Notes / Sheet sections) ----------
+     #profilePage .card has higher specificity, so the dark editor keeps its
+     own background/border; only an extra soft shadow reaches it. */
+  .card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); box-shadow:var(--sh-sm); }
+
+  /* ---------- Modals ---------- */
+  .modal{ background:rgba(15,23,42,.45); backdrop-filter:blur(2px); }
+  .modal-content{ border-radius:var(--r-xl); box-shadow:var(--sh-lg); padding:22px; border:1px solid var(--line); }
+  .modal h2{ font-size:19px; font-weight:700; letter-spacing:-0.01em; }
+
+  /* Floating Quick-Note "Back" button readable on the page bg */
+  #backToBedsBtn,#backToBedsFromWW,#backToBedsFromNotes{ align-self:flex-start; background:var(--surface); border:1px solid var(--line-2);
+    border-radius:10px; padding:8px 14px; font-weight:600; color:var(--ink-2); box-shadow:var(--sh-sm); cursor:pointer; }
+  #backToBedsFromWW:hover,#backToBedsFromNotes:hover{ background:var(--surface-2); }
+
+  /* ---------- WardWork / Notes light polish ---------- */
+  #wardWorkPage input[type=text],#wardWorkPage input[type=date],#notesEditableContent,#wwPreviewTa{
+    border:1px solid var(--line-2) !important; border-radius:9px; background:var(--surface); color:var(--ink); }
+  #wardWorkPage #wwAddBlock{ background:var(--primary); border:1px solid var(--primary); color:#fff; border-radius:10px; padding:9px 16px; font-weight:600; }
+  #wardWorkPage #wwAddBlock:hover{ background:var(--primary-700); }
+  #wwSnipToggle,#wwCopy,#wwPreviewToggle,#notesCopyBtn,#wwProfileMenuBtn,#notesProfileMenuBtn{
+    border:1px solid var(--line-2) !important; border-radius:9px !important; background:var(--surface) !important; color:var(--ink-2) !important; padding:7px 12px !important; font-weight:500; cursor:pointer; }
+  #wwSnipToggle:hover,#wwCopy:hover,#wwPreviewToggle:hover,#notesCopyBtn:hover,#wwProfileMenuBtn:hover,#notesProfileMenuBtn:hover{ background:var(--surface-2) !important; }
+  /* WardWork blocks (ww-block) as clean cards */
+  #wwList .ww-block{ border:1px solid var(--line) !important; border-radius:var(--r-lg) !important; background:var(--surface) !important; box-shadow:var(--sh-sm); }
+
+  /* ===================== Touch devices (phones + tablets) =====================
+     Make every tap target comfortably large (~44px) so controls are easy to
+     tell apart and press. */
+  @media (pointer: coarse){
+    .ward-list-head .wl-tools button{ width:44px; height:44px; font-size:20px; }
+    #wardList li{ padding:14px 12px 14px 14px; font-size:15px; }
+    #wardList li .wl-count{ font-size:13px; padding:3px 11px; }
+    .side-nav button{ padding:14px 12px; font-size:15px; }
+    .side-nav .nav-ico{ font-size:18px; }
+    #quickIOBtn{ padding:15px; font-size:16px; }
+    #profileMenuBtn{ padding:13px 14px; font-size:14px; }
+    .controls button{ padding:13px 10px; font-size:14px; }
+    #profileMenuPanel button:not(.ghost),#wwProfileMenuPanel button:not(.ghost),#notesProfileMenuPanel button:not(.ghost){ padding:12px 14px; }
+    #profileList li,#wwProfileList li,#notesProfileList li{ padding:15px 14px; font-size:15px; }
+    #closeProfilePanel,#wwCloseProfilePanel,#notesCloseProfilePanel{ padding:8px 14px; font-size:26px; }
+    .status-filter select{ padding:12px 32px 12px 12px; font-size:15px; }
+    #addBedBtn{ padding:14px 18px; font-size:15px; }
+    .bed-toolbar .btn-sm{ padding:13px 18px; font-size:14px; }
+    #bedList .actions-row button{ padding:12px 16px; font-size:14px; min-height:44px; }
+    .modal button{ padding:13px 16px; min-height:44px; }
+  }
+
+  /* ===================== Phone layout =====================
+     Below ~768px CSS width the old side-by-side layout cramped everything
+     into half the screen. Give the content the FULL width and turn the
+     sidebar into a slide-over opened from a hamburger. */
+  #mobileTabBar{ display:none; }  /* default hidden; the phone media query below turns it on */
+  /* Mobile-only controls: hidden by default, shown inside the phone media query below */
+  #wardPicker, #mobileProfileChip{ display:none; }
+  @media (max-width: 768px){
+    #sidebar{ position:fixed; top:0; left:0; bottom:0; width:min(86vw,330px); max-width:330px; z-index:1500;
+      border-right:1px solid var(--line); box-shadow:14px 0 44px rgba(15,23,42,.24);
+      transition:transform .22s ease; }
+    body.collapsed #sidebar{ display:flex; transform:translateX(-106%); }
+    #resizer{ display:none !important; }
+    #main{ width:100%; }
+
+    /* Dim backdrop behind the open sidebar (created in JS) */
+    #sidebarBackdrop{ position:fixed; inset:0; background:rgba(15,23,42,.45); z-index:1400; transition:opacity .2s; }
+    body.collapsed #sidebarBackdrop{ opacity:0; pointer-events:none; }
+
+    /* The top-left hamburger is replaced by the "More" tab on phones */
+    #expandSidebarBtn{ display:none !important; }
+    /* Quick / Work / Notes now live in the bottom bar — drop them from the sidebar */
+    #quickIOBtn, #wardWorkBtn, #notesBtn{ display:none !important; }
+
+    /* Full-width content with comfortable spacing */
+    #bedContainer{ padding:16px 16px 96px; }
+    #bedContainer .bed-head{ min-height:44px; align-items:center; }
+    #wardTitle{ font-size:20px; }
+    .bed-toolbar{ gap:10px; margin-bottom:12px; }
+    /* Ward picker dropdown (issue: pick a ward without opening the sidebar) */
+    #wardPicker{ display:inline-block; flex:1 1 140px; min-width:120px; max-width:260px; padding:11px 12px;
+      border:1px solid var(--line); border-radius:10px; background:var(--surface-2); color:var(--ink);
+      font-size:15px; font-weight:600; }
+    /* Profile chip (issue: profile menu was unreachable on phones) */
+    #mobileProfileChip{ display:flex; align-items:center; gap:6px; width:100%; margin:0 0 12px; padding:11px 14px;
+      border:1px solid var(--line); border-radius:12px; background:var(--surface-2); color:var(--ink);
+      font-size:14px; cursor:pointer; text-align:left; }
+    #mobileProfileChip .mpc-eyebrow{ font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); }
+    #mobileProfileChip .mpc-name{ font-weight:700; font-size:15px; }
+    #mobileProfileChip .mpc-caret{ margin-left:auto; color:var(--muted); }
+    #bedList{ gap:12px; }
+    #bedList .bed-item{ padding:16px; }
+    #bedList .bed-text .line1{ font-size:16px; }
+    #bedList .bed-text .line2{ font-size:14px; }
+    /* sub-pages */
+    #wardWorkPage{ padding:16px 16px 140px !important; }
+    #notesPage{ padding:16px 16px 110px !important; }
+    #profilePage{ padding:16px 16px !important; }
+
+    /* ---- Bottom tab bar ---- */
+    #mobileTabBar{ position:fixed; left:0; right:0; bottom:0; z-index:1200; display:flex;
+      background:rgba(255,255,255,.97); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
+      border-top:1px solid var(--line); box-shadow:0 -6px 20px rgba(15,23,42,.08);
+      padding-bottom:env(safe-area-inset-bottom, 0px); }
+    #mobileTabBar button{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;
+      min-height:58px; border:none; background:none; color:var(--muted); font-size:11px; font-weight:600; cursor:pointer; padding:7px 2px 6px; }
+    #mobileTabBar .mt-ico{ font-size:21px; line-height:1; }
+    #mobileTabBar button.active{ color:var(--primary); }
+    #mobileTabBar button.mt-primary .mt-ico{ width:50px; height:30px; display:grid; place-items:center;
+      background:var(--primary); color:#fff; border-radius:999px; box-shadow:0 4px 12px rgba(37,99,235,.4); }
+    #mobileTabBar button.mt-primary{ color:var(--primary); }
+    /* WardWork view keeps the tab bar: lift its Preview button + sheet above the 60px bar */
+    #wardWorkPage .fab-preview{ bottom: calc(70px + env(safe-area-inset-bottom, 0px)) !important; }
+    #wardWorkPage .mobile-preview-sheet{ bottom: calc(60px + env(safe-area-inset-bottom, 0px)) !important; }
+    /* Hide the bar only on the Quick I/O editor (it owns the bottom Preview panel) */
+    body[data-view="quick"] #mobileTabBar{ display:none; }
+  }
+  @media (min-width: 769px){ #sidebarBackdrop{ display:none !important; } #mobileTabBar{ display:none !important; } }
+

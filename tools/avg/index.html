@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Average Calculator</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, user-scalable=no, interactive-widget=resizes-content">
+    <meta name="theme-color" content="#007cba">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="ucal">
+    <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: auto;
+            position: relative;
+            min-height: 100vh;
+            /* Improve scroll behavior */
+            scroll-behavior: smooth;
+            /* Prevent scroll anchoring issues */
+            overflow-anchor: none;
+        }
+
+        input,
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        /* Mobile viewport fix for keyboard */
+        @media (max-width: 768px) {
+
+            html,
+            body {
+                height: 100vh;
+                height: 100dvh;
+                /* Dynamic viewport height */
+                overflow-x: hidden;
+                margin: 0;
+                padding: 0;
+                /* Fix smooth scrolling to top */
+                scroll-behavior: smooth;
+            }
+
+            body {
+                padding: 0;
+                /* Remove any potential scroll barriers */
+                position: relative;
+            }
+
+            .tab-container {
+                padding: 10px;
+                padding-bottom: 50px;
+                /* Ensure smooth scrolling within container */
+                scroll-behavior: smooth;
+            }
+
+            /* Special mobile average display - very distinct */
+            .mobile-average-bar {
+                position: fixed;
+                top: 52px; /* sit below the uWard shell bar */
+                left: 0;
+                right: 0;
+                z-index: 1900; /* below the shell bar (2000) */
+                background: linear-gradient(135deg, #ff6b6b, #4ecdc4);
+                color: white;
+                padding: 8px 15px;
+                font-size: 18px;
+                font-weight: bold;
+                text-align: center;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+                border-bottom: 3px solid #333;
+                display: block !important;
+                animation: slideDown 0.3s ease-out;
+                /* Prevent scroll interference */
+                pointer-events: none;
+            }
+
+            /* Hide the regular average result on mobile */
+            .average-result {
+                display: none;
+            }
+
+            /* Push content down when average calculator is active */
+            .tab-container {
+                padding-top: 50px;
+            }
+
+            /* Add padding to tab buttons on mobile */
+            .tab-buttons {
+                padding-top: 29px;
+            }
+
+            .average-inputs {
+                margin: 10px 0;
+            }
+
+            .input-row {
+                margin: 5px 0;
+            }
+
+            input {
+                font-size: 16px;
+                /* Prevents zoom on iOS */
+                padding: 12px;
+            }
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        pre {
+            background: #f9f9f9;
+            padding: 10px;
+            white-space: pre-wrap;
+        }
+
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .form-section {
+            flex: 1 1 300px;
+        }
+
+        .calendar-section {
+            flex: 1 1 300px;
+        }
+
+        /* Tab styles */
+        .tab-container {
+            margin-bottom: 20px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px;
+            background: #f0f0f0;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 0;
+        }
+
+        .tab-button.active {
+            background: #007cba;
+            color: white;
+        }
+
+        .tab-button:hover {
+            background: #e0e0e0;
+        }
+
+        .tab-button.active:hover {
+            background: #005a87;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Average calculator specific styles */
+        .decimal-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .decimal-button {
+            flex: 1;
+            padding: 8px;
+            background: #f5f5f5;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .decimal-button.active {
+            background: #28a745;
+            color: white;
+        }
+
+        .average-inputs {
+            margin: 20px 0;
+        }
+
+        .input-row {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            gap: 10px;
+        }
+
+        .input-row input {
+            flex: 1;
+            margin: 0;
+        }
+
+        .clear-input {
+            background: #ffc107;
+            color: #000;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            width: auto;
+            min-width: 60px;
+            font-size: 12px;
+        }
+
+        .remove-input {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            width: auto;
+            min-width: 40px;
+        }
+
+        .average-result {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            padding: 20px;
+            background: #e3f2fd;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .add-input-btn {
+            background: #28a745;
+            color: white;
+            flex: 1;
+        }
+
+        .clear-all-btn {
+            background: #dc3545;
+            color: white;
+            flex: 1;
+        }
+
+        .remove-extra-btn {
+            background: #fd7e14;
+            color: white;
+            flex: 1;
+        }
+
+        .force-refresh-btn {
+            background: #6f42c1;
+            color: white;
+            flex: 1;
+        }
+    </style>
+
+    <!-- Math.js for precise decimal calculations -->
+    <script>
+        // Add timestamp to force cache bust and wait for Math.js to load
+        const timestamp = Date.now();
+        const mathScript = document.createElement('script');
+        mathScript.src = `https://unpkg.com/mathjs@11.11.3/lib/browser/math.min.js?v=3.9.0&t=${timestamp}`;
+        mathScript.onload = function () {
+            // Math.js is now loaded, we can safely use math functions
+            console.log('Math.js loaded successfully');
+        };
+        mathScript.onerror = function () {
+            console.error('Failed to load Math.js, falling back to regular JavaScript math');
+        };
+        document.head.appendChild(mathScript);
+    </script>
+</head>
+
+<body>
+
+    <!-- Tab Navigation -->
+    <div class="tab-container">
+        <!-- Average Calculator Tab (Only this tab will be visible) -->
+        <div id="average-calculator" class="tab-content active">
+            <!-- Mobile average bar - shown at top on mobile only -->
+            <div id="mobile-average-bar" class="mobile-average-bar">
+                Average: 0
+            </div>
+
+            <div class="container">
+                <div class="form-section">
+                    <!-- <h2>Average Calculator</h2> -->
+
+                    <!-- Average display at the top -->
+                    <div id="average-result" class="average-result">
+                        Average: 0
+                    </div>
+
+                    <h3>Auto-Skip Settings</h3>
+                    <p style="font-size: 14px; color: #666; margin: 5px 0;">Choose how many decimal places to type
+                        before automatically jumping to the next input box:</p>
+                    <div class="decimal-buttons">
+                        <button class="decimal-button" onclick="setDecimalPrecision(0)">No decimals (skip
+                            immediately)</button>
+                        <button class="decimal-button active" onclick="setDecimalPrecision(1)">1 decimal place</button>
+                        <button class="decimal-button" onclick="setDecimalPrecision(2)">2+ decimal places</button>
+                    </div>
+
+                    <div id="decimal-selector" style="display: none; margin: 10px 0;">
+                        <label for="decimal-count">Exact number of decimal places: </label>
+                        <select id="decimal-count" onchange="updateDecimalPrecision()">
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+
+                    <div class="control-buttons">
+                        <button class="add-input-btn" onclick="addInput()">Add More Box</button>
+                        <button class="clear-all-btn" onclick="clearAllInputs()">Clear All</button>
+                        <button class="remove-extra-btn" onclick="removeExtraInputs()">Remove Extra Boxes</button>
+                        <button class="force-refresh-btn" onclick="forceRefresh()">Force Refresh</button>
+                    </div>
+
+                    <div id="average-inputs" class="average-inputs">
+                        <!-- Dynamic inputs will be added here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality - Navigate to unique URLs
+        function switchTab(tabId) {
+            if (tabId === 'ga-calculator') {
+                window.location.href = '../ga/ga.html';
+            } else if (tabId === 'average-calculator') {
+                // Stay on current page since we're already on Average Calculator
+                return;
+            } else if (tabId === 'settings') {
+                window.location.href = 'settings.html';
+            }
+        }
+
+        // Average Calculator functionality
+        let decimalPrecision = 1; // Default to 1 decimal
+        let defaultBoxCount = 3;
+        let inputCount = 0;
+
+        function initializeAverageCalculator() {
+            loadSettings();
+            createInitialInputs();
+            updateAverage();
+        }
+
+        function loadSettings() {
+            const savedBoxCount = localStorage.getItem('ucal-default-boxes');
+            const savedPrecision = localStorage.getItem('ucal-default-precision');
+
+            if (savedBoxCount) {
+                defaultBoxCount = parseInt(savedBoxCount);
+            }
+
+            if (savedPrecision) {
+                const precision = parseInt(savedPrecision);
+                decimalPrecision = precision;
+                updateDecimalPrecisionUI(precision);
+            }
+        }
+
+        function createInitialInputs() {
+            const container = document.getElementById('average-inputs');
+            container.innerHTML = '';
+            inputCount = 0;
+
+            for (let i = 0; i < defaultBoxCount; i++) {
+                addInput();
+            }
+        }
+
+        function addInput() {
+            inputCount++;
+            const container = document.getElementById('average-inputs');
+
+            const inputRow = document.createElement('div');
+            inputRow.className = 'input-row';
+            inputRow.id = `input-row-${inputCount}`;
+
+            const input = document.createElement('input');
+            input.type = 'number';
+            input.step = 'any';
+            input.id = `input-${inputCount}`;
+            input.dataset.index = inputCount; // Add data-index attribute
+            input.addEventListener('input', handleInput);
+            input.addEventListener('keydown', function (e) { handleKeydown(e, this); });
+            input.addEventListener('paste', function (e) { handlePaste(e, this); });
+
+            const clearBtn = document.createElement('button');
+            clearBtn.className = 'clear-input';
+            clearBtn.textContent = 'Clear';
+            clearBtn.onclick = function () {
+                // Clear the input in the same row as this button
+                const inputInThisRow = this.parentElement.querySelector('input');
+                if (inputInThisRow) {
+                    inputInThisRow.value = '';
+                    inputInThisRow.focus();
+                    updateAverage();
+                }
+            };
+
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'remove-input';
+            removeBtn.textContent = '×';
+            removeBtn.onclick = function () {
+                // Remove the entire row containing this button
+                this.parentElement.remove();
+                updateAllPlaceholders();
+                updateAverage();
+            };
+
+            inputRow.appendChild(input);
+            inputRow.appendChild(clearBtn);
+            if (inputCount > 3) {
+                inputRow.appendChild(removeBtn);
+            }
+
+            container.appendChild(inputRow);
+
+            // Update all placeholders to show correct numbering
+            updateAllPlaceholders();
+
+            return input;
+        }
+
+        function updateAllPlaceholders() {
+            const inputs = document.querySelectorAll('#average-inputs input');
+            inputs.forEach((input, index) => {
+                input.placeholder = `Number ${index + 1}`;
+            });
+        }
+
+        function removeInput(index) {
+            const input = document.querySelector(`input[data-index="${index}"]`);
+            if (input) {
+                const inputRow = input.closest('.input-row');
+                if (inputRow) {
+                    inputRow.remove();
+                    updateAllPlaceholders();
+                    updateAverage();
+                }
+            }
+        }
+
+        function clearInput(index) {
+            const input = document.querySelector(`input[data-index="${index}"]`);
+            if (input) {
+                input.value = '';
+                input.focus();
+                updateAverage();
+            }
+        }
+
+        function clearAllInputs() {
+            const inputs = document.querySelectorAll('#average-inputs input');
+            inputs.forEach(input => input.value = '');
+            updateAverage();
+            if (inputs.length > 0) inputs[0].focus();
+        }
+
+        function removeExtraInputs() {
+            const inputs = document.querySelectorAll('#average-inputs .input-row');
+            for (let i = inputs.length - 1; i >= 3; i--) {
+                inputs[i].remove();
+            }
+            updateAllPlaceholders(); // Update numbering after removal
+            updateAverage();
+        }
+
+        function forceRefresh() {
+            // Clear all caches and force reload
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function (registrations) {
+                    for (let registration of registrations) {
+                        registration.unregister();
+                    }
+                });
+            }
+
+            // Clear browser cache
+            if ('caches' in window) {
+                caches.keys().then(function (names) {
+                    for (let name of names) {
+                        caches.delete(name);
+                    }
+                });
+            }
+
+            // Force reload with cache bypass
+            setTimeout(() => {
+                window.location.reload(true);
+            }, 500);
+        }
+
+        function setDecimalPrecision(precision) {
+            decimalPrecision = precision;
+            updateDecimalPrecisionUI(precision);
+        }
+
+        function updateDecimalPrecisionUI(precision) {
+            // Update button states
+            document.querySelectorAll('.decimal-button').forEach(btn => btn.classList.remove('active'));
+
+            if (precision === 0) {
+                document.querySelectorAll('.decimal-button')[0].classList.add('active');
+                document.getElementById('decimal-selector').style.display = 'none';
+            } else if (precision === 1) {
+                document.querySelectorAll('.decimal-button')[1].classList.add('active');
+                document.getElementById('decimal-selector').style.display = 'none';
+            } else {
+                document.querySelectorAll('.decimal-button')[2].classList.add('active');
+                document.getElementById('decimal-selector').style.display = 'block';
+                document.getElementById('decimal-count').value = precision;
+            }
+        }
+
+        function updateDecimalPrecision() {
+            const count = parseInt(document.getElementById('decimal-count').value);
+            decimalPrecision = count;
+        }
+
+        function handleInput(event) {
+            const input = event.target;
+            const value = input.value;
+
+            // Check if we need to jump to next input (but don't auto-create)
+            if (decimalPrecision > 0) {
+                const dotIndex = value.indexOf('.');
+                if (dotIndex !== -1) {
+                    const afterDot = value.substring(dotIndex + 1);
+                    if (afterDot.length >= decimalPrecision) {
+                        const nextInput = getNextInput(input);
+                        if (nextInput) {
+                            nextInput.focus();
+                        }
+                    }
+                }
+            } else {
+                // For 0 decimal precision, jump on any non-numeric input or when number is complete
+                if (value && !value.includes('.') && isValidNumber(value)) {
+                    const nextInput = getNextInput(input);
+                    if (nextInput) {
+                        nextInput.focus();
+                    }
+                }
+            }
+
+            calculateAverage();
+        }
+
+        function handleKeydown(e, input) {
+            if (e.key === 'Enter' || e.key === 'Tab') {
+                e.preventDefault();
+                focusNextInput(input);
+            } else if (e.key === 'Backspace') {
+                // Only prevent navigation when input is empty and cursor is at start
+                // Allow normal backspace deletion when there's content
+                if (input.value === '' && input.selectionStart === 0) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }
+        }
+
+        function handlePaste(e, input) {
+            setTimeout(() => {
+                const pastedContent = input.value;
+                const numbers = pastedContent.match(/\d+\.?\d*/g);
+
+                if (numbers && numbers.length > 1) {
+                    // Multiple numbers pasted - distribute across inputs
+                    const currentInputs = Array.from(document.querySelectorAll('#average-inputs input'));
+                    const currentIndex = currentInputs.indexOf(input);
+
+                    for (let i = 0; i < numbers.length; i++) {
+                        let targetIndex = currentIndex + i;
+
+                        if (targetIndex >= currentInputs.length) {
+                            // Need to create new input
+                            addInput();
+                            currentInputs.push(document.querySelector(`#input-${inputCount}`));
+                        }
+
+                        if (targetIndex < currentInputs.length) {
+                            currentInputs[targetIndex].value = numbers[i];
+                        }
+                    }
+
+                    updateAverage();
+                }
+            }, 10);
+        }
+
+        function focusNextInput(currentInput) {
+            const inputs = Array.from(document.querySelectorAll('#average-inputs input'));
+            const currentIndex = inputs.indexOf(currentInput);
+
+            if (currentIndex < inputs.length - 1) {
+                inputs[currentIndex + 1].focus();
+            }
+            // Removed automatic input creation - user must manually add boxes
+        }
+
+        function getNextInput(currentInput) {
+            const currentIndex = parseInt(currentInput.dataset.index);
+            return document.querySelector(`input[data-index="${currentIndex + 1}"]`);
+        }
+
+        function getPreviousInput(currentInput) {
+            const currentIndex = parseInt(currentInput.dataset.index);
+            return document.querySelector(`input[data-index="${currentIndex - 1}"]`);
+        }
+
+        function isValidNumber(str) {
+            return !isNaN(parseFloat(str)) && isFinite(str);
+        }
+
+        function focusPreviousInput(currentInput) {
+            const inputs = Array.from(document.querySelectorAll('#average-inputs input'));
+            const currentIndex = inputs.indexOf(currentInput);
+
+            if (currentIndex > 0) {
+                inputs[currentIndex - 1].focus();
+            }
+        }
+
+        function updateAverage() {
+            const inputs = document.querySelectorAll('#average-inputs input');
+            const values = [];
+
+            inputs.forEach(input => {
+                const value = parseFloat(input.value);
+                if (!isNaN(value)) {
+                    values.push(value);
+                }
+            });
+
+            let average = 0;
+            if (values.length > 0) {
+                if (typeof math !== 'undefined' && math.bignumber) {
+                    try {
+                        // Use Math.js for precise decimal calculations
+                        const mathValues = values.map(v => math.bignumber(v));
+                        const sum = mathValues.reduce((acc, val) => math.add(acc, val), math.bignumber(0));
+                        const avgBigNumber = math.divide(sum, values.length);
+                        // Round to 10 decimal places to avoid floating point errors, then convert to regular number
+                        average = math.round(avgBigNumber, 10);
+                        average = math.number(average);
+                    } catch (error) {
+                        console.error('Math.js error, falling back to regular math:', error);
+                        // Fallback to regular JavaScript math
+                        const sum = values.reduce((acc, val) => acc + val, 0);
+                        average = Math.round((sum / values.length) * 1000000000000) / 1000000000000; // Round to 12 decimal places
+                    }
+                } else {
+                    // Fallback to regular JavaScript math
+                    const sum = values.reduce((acc, val) => acc + val, 0);
+                    average = Math.round((sum / values.length) * 1000000000000) / 1000000000000; // Round to 12 decimal places
+                }
+            }
+
+            const averageText = `Average: ${average}`;
+
+            // Update both regular and mobile average displays
+            document.getElementById('average-result').textContent = averageText;
+            document.getElementById('mobile-average-bar').textContent = averageText;
+        }
+
+        function calculateAverage() {
+            const inputs = document.querySelectorAll('#average-inputs input');
+            const values = [];
+
+            inputs.forEach(input => {
+                const value = parseFloat(input.value);
+                if (!isNaN(value)) {
+                    values.push(value);
+                }
+            });
+
+            let average = 0;
+            if (values.length > 0) {
+                if (typeof math !== 'undefined' && math.bignumber) {
+                    try {
+                        // Use Math.js for precise decimal calculations
+                        const mathValues = values.map(v => math.bignumber(v));
+                        const sum = mathValues.reduce((acc, val) => math.add(acc, val), math.bignumber(0));
+                        const avgBigNumber = math.divide(sum, values.length);
+                        // Round to 10 decimal places to avoid floating point errors, then convert to regular number
+                        average = math.round(avgBigNumber, 10);
+                        average = math.number(average);
+                    } catch (error) {
+                        console.error('Math.js error, falling back to regular math:', error);
+                        // Fallback to regular JavaScript math
+                        const sum = values.reduce((acc, val) => acc + val, 0);
+                        average = Math.round((sum / values.length) * 1000000000000) / 1000000000000; // Round to 12 decimal places
+                    }
+                } else {
+                    // Fallback to regular JavaScript math
+                    const sum = values.reduce((acc, val) => acc + val, 0);
+                    average = Math.round((sum / values.length) * 1000000000000) / 1000000000000; // Round to 12 decimal places
+                }
+            }
+
+            const averageText = `Average: ${average}`;
+
+            // Update both regular and mobile average displays
+            document.getElementById('average-result').textContent = averageText;
+            document.getElementById('mobile-average-bar').textContent = averageText;
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function () {
+            initializeAverageCalculator();
+        });
+    </script>
+
+
+    <!-- Tool switcher / shell -->
+    <script type="module" src="/src/shell/shell.js"></script>
+
+</body>
+
+</html>
