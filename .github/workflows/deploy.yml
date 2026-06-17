@@ -28,6 +28,8 @@ jobs:
       - name: Build
         run: npm run build
         env:
+          # GitHub Pages serves the project under /uward/.
+          BASE_PATH: /uward/
           # Shown in the hub footer so you can confirm what's live.
           VITE_BUILD_SHA: ${{ github.sha }}
       - uses: actions/upload-pages-artifact@v3

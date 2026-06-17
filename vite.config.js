@@ -4,6 +4,11 @@ import { resolve } from 'node:path';
 
 const r = (p) => resolve(import.meta.dirname, p);
 
+// Deploy base. Cloudflare Pages serves at the domain root ("/"), so that's the
+// default. GitHub Pages serves the project at "/uward/" — its workflow sets
+// BASE_PATH=/uward/. Same source, both hosts.
+const base = process.env.BASE_PATH || '/';
+
 // Multi-page app: every tool is its own HTML entry so it gets its own URL
 // (installable / add-to-home-screen independently). Add new tools here.
 const pages = {
@@ -16,10 +21,9 @@ const pages = {
 };
 
 export default defineConfig({
-  // GitHub Pages serves the repo at /uward/. Vite rewrites all asset URLs to
-  // content-hashed filenames under this base, which is what makes stale caches
-  // impossible (a new build = new URLs).
-  base: '/uward/',
+  // Vite rewrites all asset URLs to content-hashed filenames under this base,
+  // which is what makes stale caches impossible (a new build = new URLs).
+  base,
   build: {
     target: 'es2020',
     rollupOptions: { input: pages },
@@ -36,8 +40,8 @@ export default defineConfig({
         theme_color: '#2563eb',
         background_color: '#eef2f7',
         display: 'standalone',
-        start_url: '/uward/',
-        scope: '/uward/',
+        start_url: base,
+        scope: base,
         icons: [
           { src: 'icons/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
           { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },

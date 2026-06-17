@@ -54,4 +54,10 @@ vite.config.js          MPA inputs, base:'/uward/', PWA (autoUpdate) + runtime i
   precaches), stop the server, reload — it should still render. Proven working 2026-06-17.
 - After editing any tool's classic JS, remember it lives in `public/tools/<id>/`.
 
+## Workflow (prod + previews)
+
+`main` = production; `dev` and every PR get an isolated **Cloudflare Pages** preview URL.
+Build base is env-driven (`BASE_PATH`): `/` for Cloudflare (default), `/uward/` for GitHub
+Pages (set in the Actions workflow). Full details + Cloudflare connect steps: `docs/WORKFLOW.md`.
+
 Update `docs/STATE.md` and `docs/MISTAKES.md` as you learn things.

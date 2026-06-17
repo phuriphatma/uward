@@ -280,18 +280,13 @@
         }
     </style>
 
-    <!-- Math.js for precise decimal calculations -->
+    <!-- Math.js for precise decimal calculations (vendored locally so it works offline).
+         Loaded dynamically with a page-relative path so it resolves under any deploy base. -->
     <script>
-        // Add timestamp to force cache bust and wait for Math.js to load
-        const timestamp = Date.now();
         const mathScript = document.createElement('script');
-        mathScript.src = `https://unpkg.com/mathjs@11.11.3/lib/browser/math.min.js?v=3.9.0&t=${timestamp}`;
-        mathScript.onload = function () {
-            // Math.js is now loaded, we can safely use math functions
-            console.log('Math.js loaded successfully');
-        };
+        mathScript.src = '../../vendor/math.js';
         mathScript.onerror = function () {
-            console.error('Failed to load Math.js, falling back to regular JavaScript math');
+            console.error('Failed to load Math.js');
         };
         document.head.appendChild(mathScript);
     </script>
@@ -341,7 +336,6 @@
                         <button class="add-input-btn" onclick="addInput()">Add More Box</button>
                         <button class="clear-all-btn" onclick="clearAllInputs()">Clear All</button>
                         <button class="remove-extra-btn" onclick="removeExtraInputs()">Remove Extra Boxes</button>
-                        <button class="force-refresh-btn" onclick="forceRefresh()">Force Refresh</button>
                     </div>
 
                     <div id="average-inputs" class="average-inputs">
@@ -499,30 +493,8 @@
             updateAverage();
         }
 
-        function forceRefresh() {
-            // Clear all caches and force reload
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(function (registrations) {
-                    for (let registration of registrations) {
-                        registration.unregister();
-                    }
-                });
-            }
-
-            // Clear browser cache
-            if ('caches' in window) {
-                caches.keys().then(function (names) {
-                    for (let name of names) {
-                        caches.delete(name);
-                    }
-                });
-            }
-
-            // Force reload with cache bypass
-            setTimeout(() => {
-                window.location.reload(true);
-            }, 500);
-        }
+        // (Removed forceRefresh: the auto-updating service worker handles updates;
+        //  manually unregistering SWs / clearing caches here was harmful.)
 
         function setDecimalPrecision(precision) {
             decimalPrecision = precision;

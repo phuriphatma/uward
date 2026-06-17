@@ -296,79 +296,10 @@
     });
   </script>
   <script>
-    // Force refresh functionality
-    async function forceRefresh() {
-      const refreshBtn = document.getElementById('forceRefreshBtn');
 
-      try {
-        // Disable button and show loading state
-        refreshBtn.disabled = true;
-        refreshBtn.classList.add('refreshing');
-        refreshBtn.textContent = '🔄 Refreshing...';
-
-        // Clear all caches
-        if ('caches' in window) {
-          const cacheNames = await caches.keys();
-          await Promise.all(
-            cacheNames.map(cacheName => {
-              console.log('Clearing cache:', cacheName);
-              return caches.delete(cacheName);
-            })
-          );
-        }
-
-        // Unregister service worker if present
-        if ('serviceWorker' in navigator) {
-          const registrations = await navigator.serviceWorker.getRegistrations();
-          await Promise.all(
-            registrations.map(registration => {
-              console.log('Unregistering service worker');
-              return registration.unregister();
-            })
-          );
-        }
-
-        // Clear localStorage (optional - preserves user data)
-        // localStorage.clear();
-
-        // Force reload from server (bypass cache)
-        window.location.reload(true);
-
-      } catch (error) {
-        console.error('Error during force refresh:', error);
-
-        // Reset button state on error
-        refreshBtn.disabled = false;
-        refreshBtn.classList.remove('refreshing');
-        refreshBtn.textContent = '🔄 Force Refresh';
-
-        // Fallback: just reload the page
-        window.location.reload();
-      }
-    }
-
-    // Register Service Worker for offline functionality
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('../../sw.js')
-          .then((registration) => {
-            console.log('ServiceWorker registration successful with scope: ', registration.scope);
-          })
-          .catch((error) => {
-            console.log('ServiceWorker registration failed: ', error);
-          });
-      });
-    } else {
-      console.log('ServiceWorker is not supported in this browser.');
-    }
-
-    // Set up force refresh button
-    window.addEventListener('load', () => {
-      const forceRefreshBtn = document.getElementById('forceRefreshBtn');
-      if (forceRefreshBtn) {
-        forceRefreshBtn.addEventListener('click', forceRefresh);
-      }
-    });
+    // (Service worker is auto-registered by vite-plugin-pwa. The old manual
+    //  registration of ../../sw.js and the Force Refresh button were removed —
+    //  the auto-updating worker handles updates without clearing caches by hand.)
   </script>
 
   <!-- Tool switcher / shell -->

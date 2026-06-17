@@ -8,8 +8,21 @@
   width for all 6 pages.
 - PWA: Workbox `autoUpdate`, precache ~42 entries (~2.9 MB); big growth PNGs runtime-cached.
 - **Offline verified**: server stopped, hub still rendered from the service worker.
-- CDN deps (crypto-js, xlsx, flatpickr) vendored locally for offline.
+- CDN deps (crypto-js, xlsx, flatpickr, **mathjs**) vendored locally for offline.
 - CI: `.github/workflows/deploy.yml` builds + deploys to Pages on push to `main`.
+
+## QA pass (2026-06-17, later)
+
+- Fixed: `avg` loaded math.js from the unpkg CDN → **broke offline**; now vendored
+  (`public/vendor/math.js`, page-relative load).
+- Removed: `avg` "Force Refresh" button + its `forceRefresh()` (unregistered all SWs / wiped
+  all caches — harmful & redundant with autoUpdate); same dead code + a stray manual
+  `../../sw.js` registration removed from `bili`.
+- Build base is now env-driven (`BASE_PATH`): default `/` (Cloudflare), `/uward/` for Pages.
+- Added `public/_headers` (immutable hashed assets; no-cache `sw.js`/manifest; security headers).
+- Workflow documented in `docs/WORKFLOW.md`: `main`=prod, `dev`+PRs=Cloudflare previews.
+- Inherently-online (not offline) features, by design: bili's PediTools API fetch (via the
+  `api.codetabs.com` proxy — third-party dependency) and ward's Google-Sheet import.
 
 ## Post-deploy checklist
 
