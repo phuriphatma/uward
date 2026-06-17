@@ -50,3 +50,4 @@ body {
 .hub-foot .pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: var(--u-surface); border: 1px solid var(--u-line); color: var(--u-muted); }
 .hub-foot .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--u-good); }
 .hub-foot code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.hub-foot .foot-link { display: inline-block; margin: 10px 0 2px; background: none; border: none; color: var(--u-primary); font-family: inherit; font-size: 12px; cursor: pointer; text-decoration: underline; }

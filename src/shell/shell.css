@@ -119,3 +119,9 @@
 #ushell-sheet a.ush-tool .ush-ico { font-size: 22px; width: 28px; text-align: center; }
 #ushell-sheet a.ush-tool .ush-name { font-weight: 600; font-size: 15px; }
 #ushell-sheet a.ush-tool .ush-desc { font-size: 12px; color: var(--u-muted); }
+#ushell-sheet .ush-terms {
+  display: block; width: 100%; margin: 14px 0 4px; padding: 10px;
+  background: none; border: none; border-top: 1px solid var(--u-line);
+  color: var(--u-muted); font-family: inherit; font-size: 13px; cursor: pointer; text-align: center;
+}
+#ushell-sheet .ush-terms:hover { color: var(--u-primary); }

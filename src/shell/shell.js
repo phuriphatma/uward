@@ -6,6 +6,7 @@
 // needs no changes beyond that one script tag.
 import './shell.css';
 import { WARDS, ALL_TOOLS, toolHref, hubHref, currentToolId } from './tools.js';
+import { openTerms } from './consent.js'; // also self-mounts the first-use terms gate
 
 function el(tag, props = {}, children = []) {
   const node = document.createElement(tag);
@@ -37,6 +38,9 @@ function buildSheet(activeId) {
       sheet.append(a);
     });
   });
+  const terms = el('button', { class: 'ush-terms', type: 'button' }, 'ข้อกำหนดการใช้งาน & เครดิต');
+  terms.addEventListener('click', () => { backdrop.classList.remove('open'); sheet.classList.remove('open'); openTerms(); });
+  sheet.append(terms);
   const close = () => { backdrop.classList.remove('open'); sheet.classList.remove('open'); };
   backdrop.addEventListener('click', close);
   return { backdrop, sheet, open: () => { backdrop.classList.add('open'); sheet.classList.add('open'); }, close };

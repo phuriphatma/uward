@@ -1,6 +1,7 @@
 import './shell/shell.css'; // design tokens
 import './hub.css';
 import { WARDS, toolHref } from './shell/tools.js';
+import { openTerms } from './shell/consent.js'; // also self-mounts the first-use terms gate
 
 const BUILD = import.meta.env.VITE_BUILD_SHA || 'dev';
 
@@ -43,10 +44,16 @@ function render() {
     root.append(section);
   });
 
+  const termsLink = h('button', { class: 'foot-link', type: 'button' }, 'ข้อกำหนดการใช้งาน & เครดิต');
+  termsLink.addEventListener('click', openTerms);
   root.append(
     h('footer', { class: 'hub-foot' }, [
       h('span', { class: 'pill' }, [h('span', { class: 'dot' }), 'Works offline · auto-updates']),
-      h('div', {}, [document.createTextNode('build '), h('code', {}, BUILD.slice(0, 7))]),
+      termsLink,
+      h('div', {}, [
+        document.createTextNode('จัดทำโดย นศพ. ภูริพัฒณ์ มหาพรหมรักษ์ (Ung MDKKU50) · build '),
+        h('code', {}, BUILD.slice(0, 7)),
+      ]),
     ]),
   );
   root.setAttribute('aria-busy', 'false');
