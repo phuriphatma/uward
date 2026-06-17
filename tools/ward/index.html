@@ -19,7 +19,6 @@
   @media (max-width:768px){
     #sidebar{ top: 52px !important; }
     #sidebarBackdrop{ top: 52px !important; }
-    #profileMenuPanel{ top: 60px !important; }
   }
 </style>
 </head>
@@ -241,9 +240,16 @@
     </div>
 
     <div id="bedContainer">
-      <button id="mobileProfileChip" type="button" aria-label="Switch or add profile" title="Switch or add profile">
-        <span class="mpc-eyebrow">Profile</span><span class="mpc-name">Default</span><span class="mpc-caret">⌄</span>
-      </button>
+      <div class="bv-controls">
+        <button id="mobileProfileChip" type="button" aria-label="Switch or add profile" title="Switch or add profile">
+          <span class="mpc-eyebrow">Profile</span><span class="mpc-name">Default</span><span class="mpc-caret">⌄</span>
+        </button>
+        <div class="bv-ward">
+          <select id="wardPicker" aria-label="Select ward"></select>
+          <button id="addWardBtnBeds" class="bv-iconbtn" type="button" title="Add ward" aria-label="Add ward">＋</button>
+          <button id="editWardBtnBeds" class="bv-iconbtn" type="button" title="Rename or delete the selected ward" aria-label="Edit ward">✎</button>
+        </div>
+      </div>
       <div class="bed-head">
         <h2 id="wardTitle">Select a ward</h2>
         <label class="status-filter">Show
@@ -255,7 +261,6 @@
         </label>
       </div>
       <div class="bed-toolbar">
-        <select id="wardPicker" aria-label="Select ward"></select>
         <button id="addBedBtn" disabled>+ Add bed</button>
         <button id="selectBedsBtn" class="btn btn-ghost btn-sm">Select</button>
         <button id="moveSelectedBtn" class="btn btn-primary btn-sm" style="display:none;">Move selected (0)</button>

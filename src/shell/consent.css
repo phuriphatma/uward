@@ -50,6 +50,16 @@
   padding: 10px 12px;
   margin-bottom: 12px;
 }
+#uconsent-card .uc-body .uc-warn {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  color: #7c2d12;
+  border-radius: 10px;
+  padding: 10px 12px;
+  margin: 8px 0 4px;
+  font-size: 13.5px;
+  line-height: 1.65;
+}
 #uconsent-card .uc-foot {
   padding: 12px 20px calc(14px + env(safe-area-inset-bottom));
   border-top: 1px solid var(--u-line, #e2e8f0);

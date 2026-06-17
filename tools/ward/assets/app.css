@@ -535,19 +535,16 @@ body.collapsed #expandSidebarBtn{display:none}
   #profileMenuPanel,#wwProfileMenuPanel,#notesProfileMenuPanel{
     border:1px solid var(--line) !important; border-radius:var(--r-lg) !important; box-shadow:var(--sh-lg) !important;
     overflow:hidden !important; padding:0 !important; }
-  /* Desktop: the profile popover sits just under the Profile button in the sidebar. */
-  @media (min-width:769px){
-    #profileMenuPanel{ left:8px !important; right:8px !important; width:auto !important; top:calc(100% + 6px) !important; }
+  /* Profile panel = a bottom sheet attached to <body> on every width. Anchored to
+     the bottom so it never collides with the uWard shell bar at the top, and sits
+     above it (z-index > 2000). JS toggles display; CSS handles the rest. */
+  #profileMenuPanel{
+    position:fixed !important; left:0 !important; right:0 !important; bottom:0 !important; top:auto !important;
+    width:auto !important; max-width:560px !important; margin:0 auto !important;
+    max-height:82vh !important; border-radius:18px 18px 0 0 !important;
+    z-index:2600 !important; box-shadow:0 -14px 44px rgba(15,23,42,.30) !important;
   }
-  /* Phone / small-tablet (the slide-over range): the profile panel is a fixed
-     sheet near the top of the viewport. JS reparents it to <body> on open so the
-     sidebar's slide-over transform can't drag it off-screen. */
-  @media (max-width:768px){
-    #profileMenuPanel{ position:fixed !important; left:12px !important; right:12px !important;
-      top:12px !important; bottom:auto !important; width:auto !important; max-width:none !important;
-      max-height:80vh !important; z-index:1600 !important; }
-    #profileMenuBackdrop{ position:fixed; inset:0; background:rgba(15,23,42,.45); z-index:1590; }
-  }
+  #profileMenuBackdrop{ position:fixed; inset:0; background:rgba(15,23,42,.5); z-index:2599; }
   #profileList li,#wwProfileList li,#notesProfileList li{ padding:9px 14px; cursor:pointer; font-size:14px; }
   #profileList li:hover,#wwProfileList li:hover,#notesProfileList li:hover{ background:var(--surface-2); }
   /* Popover footer action buttons */
@@ -647,7 +644,23 @@ body.collapsed #expandSidebarBtn{display:none}
     border:1px solid var(--line-2) !important; border-radius:9px !important; background:var(--surface) !important; color:var(--ink-2) !important; padding:7px 12px !important; font-weight:500; cursor:pointer; }
   #wwSnipToggle:hover,#wwCopy:hover,#wwPreviewToggle:hover,#notesCopyBtn:hover,#wwProfileMenuBtn:hover,#notesProfileMenuBtn:hover{ background:var(--surface-2) !important; }
   /* WardWork blocks (ww-block) as clean cards */
-  #wwList .ww-block{ border:1px solid var(--line) !important; border-radius:var(--r-lg) !important; background:var(--surface) !important; box-shadow:var(--sh-sm); }
+  #wwList .ww-block{ border:1px solid var(--line) !important; border-radius:var(--r-lg) !important; background:var(--surface) !important; box-shadow:var(--sh-sm); padding:12px !important; }
+  /* Decluttered controls: a quiet header row (drag handle left, actions right) and
+     consistent compact icon buttons. */
+  #wwList .ww-actions .ww-block-handle{ color:var(--faint); font-size:16px; padding:2px 4px; }
+  #wardWorkPage .ww-block button.wwicon,
+  #wardWorkPage .ww-block button.wwpick{
+    width:34px; height:34px; min-width:34px !important; padding:0 !important; display:inline-grid; place-items:center;
+    border:1px solid var(--line) !important; border-radius:9px !important; background:var(--surface) !important;
+    color:var(--muted) !important; font-size:15px; font-weight:500; }
+  #wardWorkPage .ww-block button.wwicon:hover,
+  #wardWorkPage .ww-block button.wwpick:hover{ background:var(--surface-2) !important; border-color:var(--line-2) !important; color:var(--ink-2) !important; }
+  #wardWorkPage .ww-block button.delete.wwicon{ background:var(--bad-tint) !important; border-color:var(--bad-line) !important; color:var(--bad) !important; }
+  #wardWorkPage .ww-block button.wwadd{ height:34px; border:1px solid var(--line) !important; border-radius:9px !important;
+    background:var(--surface) !important; color:var(--ink-2) !important; font-weight:600; padding:0 12px !important; }
+  #wardWorkPage .ww-block button.wwadd:hover{ background:var(--surface-2) !important; border-color:var(--line-2) !important; }
+  #wwList .ww-block .wwWard, #wwList .ww-block .wwBed{ border:1px solid var(--line) !important; border-radius:9px !important; background:var(--surface) !important; }
+  #wardWorkPage .ww-task-handle{ color:var(--faint) !important; font-size:15px; }
 
   /* ===================== Touch devices (phones + tablets) =====================
      Make every tap target comfortably large (~44px) so controls are easy to
@@ -676,8 +689,25 @@ body.collapsed #expandSidebarBtn{display:none}
      into half the screen. Give the content the FULL width and turn the
      sidebar into a slide-over opened from a hamburger. */
   #mobileTabBar{ display:none; }  /* default hidden; the phone media query below turns it on */
-  /* Mobile-only controls: hidden by default, shown inside the phone media query below */
-  #wardPicker, #mobileProfileChip{ display:none; }
+
+  /* Beds-view ward + profile controls — shown on ALL widths (they replace the
+     duplicated profile + ward list that used to live in the sidebar). */
+  .bv-controls{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin:0 0 12px; }
+  #mobileProfileChip{ display:flex; align-items:center; gap:4px; flex:0 0 auto; padding:9px 12px;
+    border:1px solid var(--line); border-radius:10px; background:var(--surface-2); color:var(--ink);
+    cursor:pointer; font-size:14px; text-align:left; }
+  #mobileProfileChip .mpc-eyebrow{ font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); }
+  #mobileProfileChip .mpc-name{ font-weight:700; font-size:14px; margin-left:4px; }
+  #mobileProfileChip .mpc-caret{ margin-left:2px; color:var(--muted); }
+  .bv-ward{ display:flex; align-items:center; gap:6px; flex:1 1 220px; min-width:200px; }
+  #wardPicker{ flex:1 1 auto; min-width:120px; padding:9px 12px; border:1px solid var(--line);
+    border-radius:10px; background:var(--surface-2); color:var(--ink); font-size:15px; font-weight:600; }
+  .bv-iconbtn{ flex:0 0 auto; width:40px; height:40px; display:grid; place-items:center; border:1px solid var(--line);
+    border-radius:10px; background:var(--surface); color:var(--ink-2); font-size:18px; line-height:1; cursor:pointer; padding:0; }
+  .bv-iconbtn:hover{ background:var(--surface-2); border-color:var(--line-2); }
+  /* De-duplicate: the profile selector and ward list are removed from the sidebar. */
+  #profilesMenu{ display:none !important; }
+  #wardListContainer .ward-list-head, #wardListContainer #wardListPrefs, #wardList{ display:none !important; }
   @media (max-width: 768px){
     #sidebar{ position:fixed; top:0; left:0; bottom:0; width:min(86vw,330px); max-width:330px; z-index:1500;
       border-right:1px solid var(--line); box-shadow:14px 0 44px rgba(15,23,42,.24);
@@ -700,17 +730,9 @@ body.collapsed #expandSidebarBtn{display:none}
     #bedContainer .bed-head{ min-height:44px; align-items:center; }
     #wardTitle{ font-size:20px; }
     .bed-toolbar{ gap:10px; margin-bottom:12px; }
-    /* Ward picker dropdown (issue: pick a ward without opening the sidebar) */
-    #wardPicker{ display:inline-block; flex:1 1 140px; min-width:120px; max-width:260px; padding:11px 12px;
-      border:1px solid var(--line); border-radius:10px; background:var(--surface-2); color:var(--ink);
-      font-size:15px; font-weight:600; }
-    /* Profile chip (issue: profile menu was unreachable on phones) */
-    #mobileProfileChip{ display:flex; align-items:center; gap:6px; width:100%; margin:0 0 12px; padding:11px 14px;
-      border:1px solid var(--line); border-radius:12px; background:var(--surface-2); color:var(--ink);
-      font-size:14px; cursor:pointer; text-align:left; }
-    #mobileProfileChip .mpc-eyebrow{ font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); }
-    #mobileProfileChip .mpc-name{ font-weight:700; font-size:15px; }
-    #mobileProfileChip .mpc-caret{ margin-left:auto; color:var(--muted); }
+    /* On phones, give the profile chip its own row above the ward picker. */
+    #mobileProfileChip{ flex:1 1 100%; }
+    #mobileProfileChip .mpc-caret{ margin-left:auto; }
     #bedList{ gap:12px; }
     #bedList .bed-item{ padding:16px; }
     #bedList .bed-text .line1{ font-size:16px; }

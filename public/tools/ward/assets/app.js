@@ -598,6 +598,26 @@ function applyWardsEditMode(){
 }
 applyWardsEditMode();
 editWardsBtn.onclick=()=>{ wardsEditMode=!wardsEditMode; localStorage.setItem('wardsEditMode', JSON.stringify(wardsEditMode)); applyWardsEditMode(); };
+
+// Beds-view ward controls (the sidebar ward list is now hidden — add/rename/delete live here).
+document.getElementById('addWardBtnBeds')?.addEventListener('click', ()=>{
+  const name=prompt('Ward name'); if(!name||!name.trim()) return;
+  const id=uuid(); data.wards.push({ id, name:name.trim(), beds:[] });
+  selectedWardId=id; selectedBedId=null; saveData(); renderWards(); renderBeds();
+});
+document.getElementById('editWardBtnBeds')?.addEventListener('click', ()=>{
+  const w=(data.wards||[]).find(x=>x.id===selectedWardId);
+  if(!w){ alert('Select a ward first.'); return; }
+  const choice=prompt(`Rename ward "${w.name}" — type a new name, or type DELETE to remove this ward (and its beds).`, w.name);
+  if(choice==null) return;
+  if(choice.trim().toUpperCase()==='DELETE'){
+    if(!confirm(`Delete ward "${w.name}" and all its beds?`)) return;
+    const idx=data.wards.findIndex(x=>x.id===w.id);
+    if(idx>-1){ data.wards.splice(idx,1); if(selectedWardId===w.id){ selectedWardId=null; selectedBedId=null; } saveData(); renderWards(); renderBeds(); }
+  } else if(choice.trim()){
+    w.name=choice.trim(); saveData(); renderWards(); renderBeds();
+  }
+});
 const PRESETS_KEY='wardPresets-v1';
 let presets={};
 function loadPresets(){ try{ const raw=localStorage.getItem(PRESETS_KEY); if(raw) presets=JSON.parse(raw)||{}; }catch{ presets={}; } }
@@ -707,12 +727,11 @@ function ensureProfileBackdrop(){
 }
 function openProfilePanel(){
   if(!profileMenuPanel) return;
-  if(isSlideOverWidth()){
-    if(profileMenuPanel.parentElement !== document.body) document.body.appendChild(profileMenuPanel);
-    ensureProfileBackdrop().style.display = 'block';
-  } else if(profileMenuHome && profileMenuPanel.parentElement !== profileMenuHome){
-    profileMenuHome.appendChild(profileMenuPanel);
-  }
+  // Always render as a bottom sheet attached to <body> (the sidebar copy is
+  // hidden, and body-attachment avoids the slide-over transform / shell-bar
+  // collisions). CSS positions it; see #profileMenuPanel bottom-sheet rules.
+  if(profileMenuPanel.parentElement !== document.body) document.body.appendChild(profileMenuPanel);
+  ensureProfileBackdrop().style.display = 'block';
   profileMenuPanel.style.display = 'block';
 }
 function closeProfilePanel(){
@@ -3675,7 +3694,7 @@ function buildWWBlock(prof, bedLabel){
     group.dataset.label=bedLabel;
   const header=document.createElement('div'); header.style.display='flex'; header.style.flexDirection='column'; header.style.gap='8px'; header.style.marginBottom='6px';
   // Actions row (add/delete) above fields
-  const actions=document.createElement('div'); actions.style.display='flex'; actions.style.gap='8px'; actions.style.justifyContent='space-between'; actions.style.alignItems='center';
+  const actions=document.createElement('div'); actions.className='ww-actions'; actions.style.display='flex'; actions.style.gap='6px'; actions.style.justifyContent='flex-start'; actions.style.alignItems='center';
   const blockHandle=document.createElement('span'); blockHandle.textContent='≡'; blockHandle.className='ww-block-handle';
   // Editable ward/bed fields split into two inputs on the same line with tight separator
   const wbWrap=document.createElement('div'); wbWrap.style.display='flex'; wbWrap.style.alignItems='center'; wbWrap.style.gap='6px';
@@ -3690,8 +3709,8 @@ function buildWWBlock(prof, bedLabel){
   const bedList=document.createElement('datalist'); bedList.setAttribute('data-bedlist','1'); const bedListId='wwBedList-'+Math.floor(Math.random()*1e9); bedList.id=bedListId; 
   // bedInp.setAttribute('list', bedListId); // Removed to prevent browser autocomplete
   // picker buttons
-  const wardPickBtn=document.createElement('button'); wardPickBtn.textContent='▾'; wardPickBtn.className='ghost'; wardPickBtn.title='Pick ward'; wardPickBtn.style.minWidth='36px'; wardPickBtn.style.height='36px';
-  const bedPickBtn=document.createElement('button'); bedPickBtn.textContent='▾'; bedPickBtn.className='ghost'; bedPickBtn.title='Pick bed'; bedPickBtn.style.minWidth='36px'; bedPickBtn.style.height='36px';
+  const wardPickBtn=document.createElement('button'); wardPickBtn.textContent='▾'; wardPickBtn.className='ghost wwpick'; wardPickBtn.title='Pick ward';
+  const bedPickBtn=document.createElement('button'); bedPickBtn.textContent='▾'; bedPickBtn.className='ghost wwpick'; bedPickBtn.title='Pick bed';
     // Prefill ward/bed inputs using last-slash split.
     // Example: "กว6/1/9 บุญล้อม" -> ward "กว6/1", bed "9 บุญล้อม".
     if(!bedLabel || bedLabel.startsWith('(new) ') ){
@@ -3704,18 +3723,18 @@ function buildWWBlock(prof, bedLabel){
       // No internal separator -> treat the whole label as ward text, leave bed empty
       wardInp.value=bedLabel||''; bedInp.value='';
     }
-  const addBtn=document.createElement('button'); addBtn.textContent='+ Task'; addBtn.className='ghost'; addBtn.title='Add a task to this block';
+  const addBtn=document.createElement('button'); addBtn.textContent='+ Task'; addBtn.className='ghost wwadd'; addBtn.title='Add a task to this block'; addBtn.style.marginLeft='auto';
   // Keep the on-screen keyboard from dismissing when tapping the button.
   addBtn.addEventListener('mousedown', e=> e.preventDefault());
   addBtn.onclick=()=>{ addEmptyTask(getCurrentLabel(), true); };
   // Quick snippet insertion button inside block for convenience
-  const snQuick=document.createElement('button'); snQuick.textContent='⧉+'; snQuick.className='ghost'; snQuick.title='Insert snippet';
+  const snQuick=document.createElement('button'); snQuick.textContent='⧉+'; snQuick.className='ghost wwicon'; snQuick.title='Insert snippet';
   snQuick.onclick=()=>{
     if(!wwSnippets.length){ alert('No snippets yet. Use Snippets panel to add some.'); return; }
     // Show simple chooser (reuse showMenu) with snippets
     showInlineSnippetMenu(snQuick, getCurrentLabel());
   };
-    const delBtn=document.createElement('button'); delBtn.textContent='delete block'; delBtn.className='delete'; delBtn.onclick=()=>{
+    const delBtn=document.createElement('button'); delBtn.textContent='🗑'; delBtn.className='delete wwicon'; delBtn.title='Delete block'; delBtn.onclick=()=>{
       const cur=getCurrentLabel();
       // Only delete the tasks that are currently in this block
       const taskIdsInBlock = tasks.map(t => t.id);
@@ -3890,7 +3909,7 @@ function buildWWBlock(prof, bedLabel){
     const isTouch=('ontouchstart' in window)||(navigator.maxTouchPoints>0);
     function makeRow(t){
   const row=document.createElement('div'); row.style.display='grid'; row.style.gridTemplateColumns='auto 1fr auto auto'; row.style.gap='6px'; row.style.alignItems='center'; row.dataset.taskId=t.id;
-      const dot=document.createElement('span'); dot.textContent='⭕️'; dot.setAttribute('aria-hidden','true'); dot.style.opacity='0.9'; dot.className='ww-task-handle';
+      const dot=document.createElement('span'); dot.textContent='⠿'; dot.setAttribute('aria-hidden','true'); dot.style.opacity='0.9'; dot.className='ww-task-handle';
   const inp=document.createElement('textarea'); inp.rows=1; inp.value=t.task; inp.style.width='100%'; inp.style.resize='vertical'; inp.dataset.id=t.id; inp.style.fontSize='15px'; inp.style.lineHeight='1.3'; inp.style.minHeight='34px'; inp.style.padding='6px 8px'; inp.style.minWidth='0';
   const autoresize=()=>{ inp.style.height='auto'; inp.style.height = (inp.scrollHeight)+'px'; };
   setTimeout(autoresize, 0);
@@ -3899,7 +3918,7 @@ function buildWWBlock(prof, bedLabel){
     inp.addEventListener('focus', ()=>{ showSnippetSuggest(inp, inp.value, (val)=>{ inp.value=val; autoresize(); const rec=wwTasks.find(x=>x.id===t.id); if(rec){ rec.task=inp.value; saveWW(wwTasks); updateWWPreview(); } }); });
       // hide suggestions on blur (allow time for click)
     inp.addEventListener('blur', ()=> setTimeout(()=> closeSnippetSuggest(), 120));
-  const dup=document.createElement('button'); dup.textContent='⧉'; dup.className='ghost'; dup.title='Duplicate'; dup.style.minWidth='36px'; dup.style.height='32px';
+  const dup=document.createElement('button'); dup.textContent='⧉'; dup.className='ghost wwicon'; dup.title='Duplicate'; dup.style.minWidth='36px'; dup.style.height='32px';
       dup.onclick=()=>{
         const newId='ww'+Date.now()+Math.floor(Math.random()*1000);
         wwTasks.push({ id:newId, bed: getCurrentLabel(), task: t.task });
@@ -3909,7 +3928,7 @@ function buildWWBlock(prof, bedLabel){
         if(beforeId){ reorderTasks(getCurrentLabel(), newId, beforeId); }
         else { renderWW(); }
       };
-  const del=document.createElement('button'); del.textContent='×'; del.className='ghost'; del.title='Delete'; del.style.minWidth='34px'; del.style.height='32px'; del.onclick=()=>{ wwTasks=wwTasks.filter(x=>x.id!==t.id); saveWW(wwTasks); renderWW(); };
+  const del=document.createElement('button'); del.textContent='×'; del.className='ghost wwicon'; del.title='Delete'; del.style.minWidth='34px'; del.style.height='32px'; del.onclick=()=>{ wwTasks=wwTasks.filter(x=>x.id!==t.id); saveWW(wwTasks); renderWW(); };
       row.appendChild(dot); row.appendChild(inp); row.appendChild(dup); row.appendChild(del);
       if(!isTouch){
         // Only the dot is draggable; row is drop/move/duplicate target.

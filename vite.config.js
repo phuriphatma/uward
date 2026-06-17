@@ -9,6 +9,34 @@ const r = (p) => resolve(import.meta.dirname, p);
 // BASE_PATH=/uward/. Same source, both hosts.
 const base = process.env.BASE_PATH || '/';
 
+// Inject a PAGE-RELATIVE manifest link + apple-touch-icon into every entry, so
+// each tool installs as its OWN app launching at its OWN url. The manifest file
+// sits next to each index.html (public/tools/<id>/manifest.webmanifest) with a
+// relative start_url ("./"), so this is base-agnostic (works on Cloudflare "/"
+// and GitHub Pages "/uward/"). Injected post-transform so Vite doesn't try to
+// resolve the relative hrefs as bundled assets.
+function perPageManifestLinks() {
+  return {
+    name: 'per-page-manifest-links',
+    transformIndexHtml: {
+      order: 'post',
+      handler(html, ctx) {
+        const depth = ctx.path.replace(/^\//, '').split('/').length - 1; // dirs above the file
+        const up = depth ? '../'.repeat(depth) : '';
+        return {
+          html,
+          tags: [
+            { tag: 'link', attrs: { rel: 'manifest', href: 'manifest.webmanifest' }, injectTo: 'head' },
+            { tag: 'link', attrs: { rel: 'apple-touch-icon', href: up + 'icons/icon-192.png' }, injectTo: 'head' },
+            { tag: 'meta', attrs: { name: 'apple-mobile-web-app-capable', content: 'yes' }, injectTo: 'head' },
+            { tag: 'meta', attrs: { name: 'mobile-web-app-capable', content: 'yes' }, injectTo: 'head' },
+          ],
+        };
+      },
+    },
+  };
+}
+
 // Multi-page app: every tool is its own HTML entry so it gets its own URL
 // (installable / add-to-home-screen independently). Add new tools here.
 const pages = {
@@ -29,29 +57,17 @@ export default defineConfig({
     rollupOptions: { input: pages },
   },
   plugins: [
+    perPageManifestLinks(),
     VitePWA({
       registerType: 'autoUpdate',     // new service worker takes over automatically
       injectRegister: 'auto',
       includeAssets: ['icons/*'],
-      manifest: {
-        name: 'uWard — Clinical Tools',
-        short_name: 'uWard',
-        description: 'OB-GYN, Pediatrics & Ward Management tools — works offline.',
-        theme_color: '#2563eb',
-        background_color: '#eef2f7',
-        display: 'standalone',
-        start_url: base,
-        scope: base,
-        icons: [
-          { src: 'icons/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any' },
-          { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },
-          { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' },
-          { src: 'icons/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
-        ],
-      },
+      // We author per-page manifests ourselves (public/**/manifest.webmanifest)
+      // so each tool installs as its own app — see perPageManifestLinks().
+      manifest: false,
       workbox: {
         // Precache code + html + small data so every tool works offline.
-        globPatterns: ['**/*.{js,css,html,json,svg,woff,woff2,ico}'],
+        globPatterns: ['**/*.{js,css,html,json,webmanifest,svg,woff,woff2,ico}'],
         cleanupOutdatedCaches: true,
         clientsClaim: true,
         skipWaiting: true,
