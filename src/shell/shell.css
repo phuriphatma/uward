@@ -27,6 +27,27 @@
   --u-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
+/* Dark mode: override the shared tokens. Tools that use these (shell, hub, theme
+   baseline) flip automatically. */
+:root[data-theme="dark"] {
+  --u-bg: #0b1020;
+  --u-surface: #141b2e;
+  --u-surface-2: #0f1626;
+  --u-ink: #e8ecf1;
+  --u-ink-2: #c7d0dc;
+  --u-muted: #9aa6b6;
+  --u-faint: #6b7688;
+  --u-line: #26304a;
+  --u-line-2: #34415f;
+  --u-primary: #5b9cff;
+  --u-primary-700: #7eb0ff;
+  --u-primary-tint: #16243f;
+  --u-good: #3ecf8e;
+  --u-bad: #ff6b6b;
+  --u-sh: 0 1px 2px rgba(0, 0, 0, .4), 0 4px 14px rgba(0, 0, 0, .4);
+  --u-sh-lg: 0 12px 40px rgba(0, 0, 0, .55);
+}
+
 /* ---------- In-tool top bar (sticky) ---------- */
 #ushell-bar {
   position: sticky;
@@ -37,7 +58,8 @@
   gap: 8px;
   height: var(--u-shell-h);
   padding: 0 10px;
-  background: rgba(255, 255, 255, .9);
+  background: var(--u-surface);
+  background: color-mix(in srgb, var(--u-surface) 88%, transparent);
   backdrop-filter: saturate(1.2) blur(8px);
   -webkit-backdrop-filter: saturate(1.2) blur(8px);
   border-bottom: 1px solid var(--u-line);
@@ -72,7 +94,8 @@
   text-overflow: ellipsis;
   text-align: center;
 }
-#ushell-switch { color: var(--u-primary); border-color: #cdddff; background: var(--u-primary-tint); }
+#ushell-switch { color: var(--u-primary); border-color: var(--u-line-2); background: var(--u-primary-tint); }
+#ushell-theme { font-size: 17px !important; padding: 0 11px !important; }
 
 /* ---------- Tool-switcher bottom sheet ---------- */
 #ushell-backdrop {

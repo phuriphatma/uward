@@ -8,6 +8,7 @@ import './shell.css';
 import './theme.css'; // shared modern baseline across all tools
 import { WARDS, ALL_TOOLS, toolHref, hubHref, currentToolId } from './tools.js';
 import { openTerms } from './consent.js'; // also self-mounts the first-use terms gate
+import { makeThemeToggle } from './themetoggle.js';
 
 function el(tag, props = {}, children = []) {
   const node = document.createElement(tag);
@@ -62,7 +63,10 @@ function mount() {
   const switchBtn = el('button', { id: 'ushell-switch', title: 'Switch tool' }, '⇄ Tools');
   switchBtn.addEventListener('click', open);
 
-  const bar = el('div', { id: 'ushell-bar' }, [home, title, switchBtn]);
+  const themeBtn = makeThemeToggle();
+  themeBtn.id = 'ushell-theme';
+
+  const bar = el('div', { id: 'ushell-bar' }, [home, title, themeBtn, switchBtn]);
 
   document.body.prepend(bar);
   document.body.append(backdrop, sheet);

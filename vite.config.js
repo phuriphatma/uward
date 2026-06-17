@@ -26,6 +26,15 @@ function perPageManifestLinks() {
         return {
           html,
           tags: [
+            // Apply saved/system theme before paint (no flash of the wrong theme).
+            {
+              tag: 'script',
+              injectTo: 'head-prepend',
+              children:
+                "(function(){try{var k='uward-theme',t=localStorage.getItem(k);" +
+                "if(t!=='dark'&&t!=='light'){t=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}" +
+                "document.documentElement.setAttribute('data-theme',t);}catch(e){}})();",
+            },
             { tag: 'link', attrs: { rel: 'manifest', href: 'manifest.webmanifest' }, injectTo: 'head' },
             { tag: 'link', attrs: { rel: 'apple-touch-icon', href: up + 'icons/icon-192.png' }, injectTo: 'head' },
             { tag: 'meta', attrs: { name: 'apple-mobile-web-app-capable', content: 'yes' }, injectTo: 'head' },

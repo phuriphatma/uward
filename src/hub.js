@@ -3,6 +3,7 @@ import './shell/theme.css'; // shared modern baseline
 import './hub.css';
 import { WARDS, toolHref } from './shell/tools.js';
 import { openTerms } from './shell/consent.js'; // also self-mounts the first-use terms gate
+import { makeThemeToggle } from './shell/themetoggle.js';
 
 const BUILD = import.meta.env.VITE_BUILD_SHA || 'dev';
 
@@ -22,11 +23,13 @@ function render() {
   const root = document.getElementById('hub');
   root.replaceChildren();
 
+  const themeBtn = makeThemeToggle();
+  themeBtn.className = 'hub-theme-toggle';
   const head = h('header', { class: 'hub-head' }, [
     h('div', { class: 'hub-brand' }, [h('span', { class: 'mark' }, '✚'), 'uWard']),
     h('p', { class: 'hub-tagline' }, 'Bedside clinical tools — installable & offline'),
   ]);
-  root.append(head);
+  root.append(themeBtn, head);
 
   WARDS.forEach((w) => {
     const section = h('section', { class: 'ward' });
