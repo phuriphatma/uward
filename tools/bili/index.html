@@ -130,48 +130,6 @@
 
 
       <section class="card">
-        <h2>Verify AAP table (optional)</h2>
-        <p class="small">Paste 15 rows × 24 values (360 numbers) for the selected GA. Choose
-          Exchange (Table 4) or
-          Phototherapy (Table 2). Non-numeric text will be ignored.</p>
-        <div class="grid">
-          <label>
-            <span>Dataset</span>
-            <select id="datasetKind">
-              <option value="exchange" selected>Exchange (AAP Table 4)</option>
-              <option value="phototherapy">Phototherapy (AAP Table 2)</option>
-            </select>
-          </label>
-          <label>
-            <span>Paste table values</span>
-            <textarea id="verifyInput" rows="6"
-              style="width:100%;font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"></textarea>
-          </label>
-        </div>
-        <div class="actions">
-          <button id="verifyBtn" type="button">Verify against JS dataset</button>
-          <button id="exportBtn" type="button">Export JS dataset JSON</button>
-        </div>
-        <div id="verifyOutput" class="summary"></div>
-
-        <hr />
-        <h3>Convert pasted table to JS dataset rows</h3>
-        <p class="small">Converts the day/hour table into array-of-arrays rows, ready to
-          paste
-          inside the dataset file.
-        </p>
-        <div class="actions">
-          <button id="convertBtn" type="button">Convert to JS rows</button>
-          <button id="copyConvertBtn" type="button">Copy output</button>
-        </div>
-        <label>
-          <span class="small">JS rows output</span>
-          <textarea id="convertOutput" rows="8" readonly
-            style="width:100%;font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, monospace"></textarea>
-        </label>
-      </section>
-
-      <section class="card">
         <h2>Usage notes</h2>
         <ul>
           <li>Leave bilirubin blank to view thresholds only.</li>
