@@ -795,7 +795,7 @@ sheetFetchBtn?.addEventListener('click', async ()=>{
             sheetTabChips.innerHTML='';
             names.forEach(n=>{
               const chip=document.createElement('button');
-              chip.type='button'; chip.textContent=n; chip.style.cssText='padding:4px 8px;border-radius:999px;border:1px solid #ccd6e6;background:#f6f8ff;color:#1a2750;font-size:12px;';
+              chip.type='button'; chip.textContent=n; chip.style.cssText='padding:4px 8px;border-radius:999px;border:1px solid var(--line-2);background:var(--surface-2);color:var(--ink);font-size:12px;';
               chip.onclick=()=>{ if(sheetTabName) sheetTabName.value=n; loadByTabName(n, sid2); };
               sheetTabChips.appendChild(chip);
             });
@@ -891,7 +891,7 @@ function renderSheetPreview(){
   const thead=[]; const tbody=[];
   if(hasHeader){
     thead.push('<thead><tr>');
-    for(let c=0;c<cols;c++){ const txt=((rows[0]||[])[c]||''); thead.push(`<th data-col=\"${c}\" style=\"position:sticky;top:0;background:#fafafa;border:1px solid #ddd;padding:4px;\">${escapeHtml(txt)}</th>`); }
+    for(let c=0;c<cols;c++){ const txt=((rows[0]||[])[c]||''); thead.push(`<th data-col=\"${c}\" style=\"position:sticky;top:0;background:var(--surface-2);border:1px solid var(--line);padding:4px;\">${escapeHtml(txt)}</th>`); }
     thead.push('</tr></thead>');
   }
   tbody.push('<tbody>');
@@ -1720,7 +1720,7 @@ const notifyEditor=(function(){
       const dropdown = document.createElement('div');
       dropdown.className = 'io-snippet-suggestions';
       dropdown.style.position = 'fixed'; // Changed from absolute to fixed
-      dropdown.style.background = '#fff';
+      dropdown.style.background = 'var(--surface)';
       dropdown.style.border = '1px solid #ddd';
       dropdown.style.borderRadius = '4px';
       dropdown.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
@@ -1756,7 +1756,7 @@ const notifyEditor=(function(){
           if(changeCb) changeCb();
         });
         item.addEventListener('mouseover', () => {
-          item.style.background = '#f0f0f0';
+          item.style.background = 'var(--surface-2)';
         });
         item.addEventListener('mouseout', () => {
           item.style.background = '';
@@ -2618,7 +2618,7 @@ function updateWWProfileUI(){
       li.style.cursor = 'pointer';
       if(p.id === currentWWProfileId){
         li.style.fontWeight = '600';
-        li.style.background = '#f5f5f5';
+        li.style.background = 'var(--surface-2)';
       }
       li.addEventListener('click', () => {
         switchWWProfile(p.id);
@@ -2889,7 +2889,7 @@ function renderNotesProfileList(){
     const li = document.createElement('li');
     li.style.cssText = 'padding:8px 12px; cursor:pointer; border-radius:6px; margin:2px 6px;';
     if(id === currentNotesProfileId){
-      li.style.backgroundColor = '#e3f2fd';
+      li.style.backgroundColor = 'var(--primary-tint)';
       li.style.fontWeight = '600';
     }
     li.textContent = prof.name || 'Untitled';
@@ -2903,7 +2903,7 @@ function renderNotesProfileList(){
       }
       notesProfileMenuPanel.style.display = 'none';
     };
-    li.onmouseenter = () => { if(id !== currentNotesProfileId) li.style.backgroundColor = '#f5f5f5'; };
+    li.onmouseenter = () => { if(id !== currentNotesProfileId) li.style.backgroundColor = 'var(--surface-2)'; };
     li.onmouseleave = () => { if(id !== currentNotesProfileId) li.style.backgroundColor = ''; };
     notesProfileList.appendChild(li);
   });
@@ -3689,7 +3689,7 @@ function buildWWBlock(prof, bedLabel){
     const tasks = wwTasks.filter(t=> (t.bed||'')===bedLabel);
     const group=document.createElement('div');
     group.className='ww-block';
-    group.style.border='1px solid #ddd'; group.style.borderRadius='10px'; group.style.padding='8px 10px'; group.style.background='#fafafa';
+    group.style.border='1px solid var(--line)'; group.style.borderRadius='10px'; group.style.padding='8px 10px'; group.style.background='var(--surface-2)';
     group.setAttribute('draggable','true');
     group.dataset.label=bedLabel;
   const header=document.createElement('div'); header.style.display='flex'; header.style.flexDirection='column'; header.style.gap='8px'; header.style.marginBottom='6px';
@@ -3813,7 +3813,7 @@ function buildWWBlock(prof, bedLabel){
     function showMenu(anchor, items, onPick){
       const menu=document.createElement('div');
       menu.style.position='fixed';
-      menu.style.background='#fff'; menu.style.border='1px solid #ddd'; menu.style.borderRadius='8px'; menu.style.boxShadow='0 8px 24px rgba(0,0,0,0.15)';
+      menu.style.background='var(--surface)'; menu.style.border='1px solid var(--line)'; menu.style.borderRadius='8px'; menu.style.boxShadow='0 8px 24px rgba(0,0,0,0.15)';
       menu.style.zIndex='10000'; menu.style.maxHeight='40vh'; menu.style.overflow='auto';
       const positionMenu=()=>{
         const rect=anchor.getBoundingClientRect();
@@ -3831,7 +3831,7 @@ function buildWWBlock(prof, bedLabel){
       const onDoc=(e)=>{ if(!menu.contains(e.target) && e.target!==anchor) close(); };
       items.forEach(txt=>{
         const it=document.createElement('div'); it.textContent=txt; it.style.padding='8px 12px'; it.style.cursor='pointer';
-        it.addEventListener('mouseenter', ()=> it.style.background='#f3f5f8');
+        it.addEventListener('mouseenter', ()=> it.style.background='var(--surface-2)');
         it.addEventListener('mouseleave', ()=> it.style.background='');
         it.addEventListener('click', ()=>{ onPick(txt); close(); });
         menu.appendChild(it);
@@ -3857,11 +3857,11 @@ function buildWWBlock(prof, bedLabel){
       if(items.length===0){ closeSnippetSuggest(); return; }
       if(wwSuggMenu){ closeSnippetSuggest(); }
       const menu=document.createElement('div'); wwSuggMenu=menu;
-      menu.style.position='fixed'; menu.style.background='#fff'; menu.style.border='1px solid #ddd'; menu.style.borderRadius='8px'; menu.style.boxShadow='0 8px 24px rgba(0,0,0,0.15)';
+      menu.style.position='fixed'; menu.style.background='var(--surface)'; menu.style.border='1px solid var(--line)'; menu.style.borderRadius='8px'; menu.style.boxShadow='0 8px 24px rgba(0,0,0,0.15)';
       menu.style.zIndex='10000'; menu.style.maxHeight='40vh'; menu.style.overflow='auto';
       items.forEach(txt=>{
         const it=document.createElement('div'); it.textContent=txt; it.style.padding='8px 12px'; it.style.cursor='pointer';
-        it.addEventListener('mouseenter', ()=> it.style.background='#f3f5f8');
+        it.addEventListener('mouseenter', ()=> it.style.background='var(--surface-2)');
         it.addEventListener('mouseleave', ()=> it.style.background='');
         it.addEventListener('click', ()=>{ onPick(txt); closeSnippetSuggest(); });
         menu.appendChild(it);
@@ -3935,7 +3935,7 @@ function buildWWBlock(prof, bedLabel){
         dot.setAttribute('draggable','true');
         dot.addEventListener('dragstart', (e)=>{ e.dataTransfer.setData('text/plain', t.id); row.style.opacity='0.55'; });
         dot.addEventListener('dragend', ()=>{ row.style.opacity=''; });
-        row.addEventListener('dragover', (e)=>{ e.preventDefault(); row.style.background='#eef3ff'; });
+        row.addEventListener('dragover', (e)=>{ e.preventDefault(); row.style.background='var(--surface-2)'; });
         row.addEventListener('dragleave', ()=>{ row.style.background=''; });
         row.addEventListener('drop', (e)=>{ e.preventDefault(); row.style.background=''; const fromId=e.dataTransfer.getData('text/plain'); if(!fromId) return; const toId=t.id; const fromTask=wwTasks.find(x=> x.id===fromId); if(!fromTask) return;
           const currentLabel = getCurrentLabel();
@@ -3971,7 +3971,7 @@ function buildWWBlock(prof, bedLabel){
             const ph=document.createElement('div'); ph.style.height=r.height+'px'; ph.style.border='2px dashed #5b9cff'; ph.style.borderRadius='8px'; ph.style.margin='0';
             const container=listWrap; const sourceLabel=getCurrentLabel(); const taskId=t.id;
             container.insertBefore(ph, row.nextSibling);
-            row.style.position='fixed'; row.style.left=r.left+'px'; row.style.top=r.top+'px'; row.style.width=r.width+'px'; row.style.zIndex='2000'; row.style.opacity='0.9'; row.style.background='#fff'; row.style.boxShadow='0 8px 24px rgba(0,0,0,0.25)'; row.style.pointerEvents='none';
+            row.style.position='fixed'; row.style.left=r.left+'px'; row.style.top=r.top+'px'; row.style.width=r.width+'px'; row.style.zIndex='2000'; row.style.opacity='0.9'; row.style.background='var(--surface)'; row.style.boxShadow='0 8px 24px rgba(0,0,0,0.25)'; row.style.pointerEvents='none';
             dragState={placeholder:ph,startY,startX,row,origIdx:Array.from(container.children).indexOf(row), container, sourceLabel, taskId};
             document.body.style.userSelect='none';
           }, LONG_MS);

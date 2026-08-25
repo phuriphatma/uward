@@ -32,7 +32,7 @@ function perPageManifestLinks() {
               injectTo: 'head-prepend',
               children:
                 "(function(){try{var k='uward-theme',t=localStorage.getItem(k);" +
-                "if(t!=='dark'&&t!=='light'){t=(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light';}" +
+                "if(t!=='dark'&&t!=='light'){t='light';}" +
                 "document.documentElement.setAttribute('data-theme',t);}catch(e){}})();",
             },
             { tag: 'link', attrs: { rel: 'manifest', href: 'manifest.webmanifest' }, injectTo: 'head' },

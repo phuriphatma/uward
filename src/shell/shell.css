@@ -138,7 +138,7 @@
   border: 1px solid transparent;
 }
 #ushell-sheet a.ush-tool:hover { background: var(--u-surface-2); }
-#ushell-sheet a.ush-tool.active { background: var(--u-primary-tint); border-color: #cdddff; }
+#ushell-sheet a.ush-tool.active { background: var(--u-primary-tint); border-color: var(--u-line-2); }
 #ushell-sheet a.ush-tool .ush-ico { font-size: 22px; width: 28px; text-align: center; }
 #ushell-sheet a.ush-tool .ush-name { font-weight: 600; font-size: 15px; }
 #ushell-sheet a.ush-tool .ush-desc { font-size: 12px; color: var(--u-muted); }

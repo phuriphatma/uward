@@ -7,10 +7,11 @@
     <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: var(--u-font, Arial, sans-serif);
             margin: 0;
             padding: 10px;
-            background-color: #f5f5f5;
+            background-color: var(--u-bg, #f5f5f5);
+            color: var(--u-ink, #0f172a);
         }
         
         .container {
@@ -21,20 +22,20 @@
         }
         
         .form-section {
-            background: white;
+            background: var(--u-surface, white);
             padding: 15px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: var(--u-sh, 0 2px 4px rgba(0,0,0,0.1));
             min-width: 280px;
             flex: 1;
             max-width: 100%;
         }
         
         .chart-section {
-            background: white;
+            background: var(--u-surface, white);
             padding: 15px;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: var(--u-sh, 0 2px 4px rgba(0,0,0,0.1));
             flex: 2;
             max-width: 100%;
             overflow: auto;
@@ -48,15 +49,17 @@
             display: block;
             margin-bottom: 5px;
             font-weight: bold;
-            color: #333;
+            color: var(--u-ink, #333);
         }
         
         input, select {
             width: 100%;
             padding: 8px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--u-line, #ddd);
             border-radius: 4px;
             font-size: 14px;
+            background: var(--u-surface, #fff);
+            color: var(--u-ink, #0f172a);
         }
         /* Constrain numeric field width so they don't stretch excessively on wide screens */
         .inline-clear-wrap input[type=number] {
@@ -81,7 +84,7 @@
         }
         
         button {
-            background-color: #007bff;
+            background-color: var(--u-primary, #007bff);
             color: white;
             padding: 10px 20px;
             border: none;
@@ -92,7 +95,7 @@
         }
         
         button:hover {
-            background-color: #0056b3;
+            background-color: var(--u-primary-700, #0056b3);
         }
         
         #chartContainer {
@@ -102,7 +105,7 @@
         }
         
         #chartCanvas {
-            border: 1px solid #ddd;
+            border: 1px solid var(--u-line, #ddd);
             cursor: crosshair;
             max-width: 100%;
             height: auto;
@@ -163,13 +166,13 @@
         }
         
         .calibration-item.completed {
-            background-color: #d4edda;
-            color: #155724;
+            background-color: var(--gc-cal-done-bg, #d4edda);
+            color: var(--gc-cal-done-ink, #155724);
         }
         
         .calibration-item.current {
-            background-color: #fff3cd;
-            color: #856404;
+            background-color: var(--gc-cal-cur-bg, #fff3cd);
+            color: var(--gc-cal-cur-ink, #856404);
             font-weight: bold;
         }
         
@@ -180,31 +183,32 @@
         }
         
         .clickable-curve:hover {
-            background-color: #e2e6ea;
-            border-color: #adb5bd;
+            background-color: var(--u-surface-2, #e2e6ea);
+            border-color: var(--u-line-2, #adb5bd);
         }
         
         .calibration-item.needs-recalibration {
-            background-color: #f8d7da;
-            color: #721c24;
+            background-color: var(--gc-cal-bad-bg, #f8d7da);
+            color: var(--gc-cal-bad-ink, #721c24);
         }
         
         .results {
             margin-top: 15px;
             padding: 10px;
-            background-color: #e9ecef;
+            background-color: var(--u-surface-2, #e9ecef);
+            color: var(--u-ink-2, #334155);
             border-radius: 4px;
             font-size: 14px;
         }
         
         h1 {
             text-align: center;
-            color: #333;
+            color: var(--u-ink, #333);
             margin-bottom: 30px;
         }
         
         h2 {
-            color: #333;
+            color: var(--u-ink, #333);
             margin-top: 0;
         }
         .tabs {
@@ -218,14 +222,15 @@
   padding: 10px 18px;
   border: none;
   border-radius: 6px;
-  background: #e0e0e0;
+  background: var(--u-surface-2, #e0e0e0);
+  color: var(--u-ink-2, #334155);
   cursor: pointer;
   font-size: 14px;
   font-weight: bold;
 }
 
 .tab-btn.active {
-  background: #007bff;
+  background: var(--u-primary, #007bff);
   color: white;
 }
 
@@ -247,11 +252,17 @@
         /* Clear button styling */
         .inline-clear-wrap { position: relative; }
         .inline-clear-wrap input { padding-right: 26px; }
-        .clear-btn { position:absolute; top:50%; right:4px; transform:translateY(-50%); width:20px; height:20px; border:none; border-radius:50%; background:#e0e0e0; color:#444; font-size:14px; line-height:20px; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center; }
-        .clear-btn:hover { background:#d0d0d0; }
+        .clear-btn { position:absolute; top:50%; right:4px; transform:translateY(-50%); width:20px; height:20px; border:none; border-radius:50%; background:var(--u-line, #e0e0e0); color:var(--u-ink-2, #444); font-size:14px; line-height:20px; cursor:pointer; font-weight:bold; display:flex; align-items:center; justify-content:center; }
+        .clear-btn:hover { background:var(--u-line-2, #d0d0d0); }
         .age-inputs { gap:6px; }
         .age-inputs .inline-clear-wrap { flex:1; }
         @media (max-width: 768px){ .inline-clear-wrap input { padding-right:30px; } }
+        
+        :root[data-theme="dark"] {
+            --gc-cal-done-bg: #052e16; --gc-cal-done-ink: #4ade80;
+            --gc-cal-cur-bg: #2a1a0a; --gc-cal-cur-ink: #fbbf24;
+            --gc-cal-bad-bg: #2a0a0a; --gc-cal-bad-ink: #f87171;
+        }
     </style>
 </head>
 <body>
@@ -300,8 +311,8 @@
                             <button type="button" class="clear-btn" title="Clear" data-clear-target="ageDays">×</button>
                         </div>
                     </div>
-                    <div style="margin-top:6px; display:flex; justify-content:flex-end;">
-                        <button type="button" id="clearAgeAllBtn" style="background:#bbb;color:#222;padding:6px 12px;font-size:12px;border-radius:6px;">Clear Age (All)</button>
+                    <div class="age-clear-wrapper">
+                        <button type="button" id="clearAgeAllBtn" class="clear-age-btn">Clear Age (All)</button>
                     </div>
                 </div>
                 
@@ -329,7 +340,7 @@
                     </div>
                 </div>
                 
-                <button type="button" id="multiPlotBtn" style="margin-top:8px;background:#6f42c1;">Analyze (All Charts)</button>
+                <button type="button" id="multiPlotBtn" style="margin-top:8px;background:var(--u-primary, #6f42c1);">Analyze (All Charts)</button>
             </form>
             
             <!-- Percentile Display Panel -->
@@ -368,11 +379,11 @@
         
         <div class="chart-section">
             <h2 style="margin-top:0;">All Charts</h2>
-            <div style="margin-bottom: 6px; font-size: 13px; color:#444;">Automatically generates every applicable chart (Age, W/H, HC) based on inputs.</div>
+            <div style="margin-bottom: 6px; font-size: 13px; color:var(--u-ink-2, #444);">Automatically generates every applicable chart (Age, W/H, HC) based on inputs.</div>
             <div id="multiChartsContainer" style="margin-top:20px; display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:20px;">
                 <!-- Dynamic multiple charts will be injected here -->
             </div>
-            <div id="analysisStatus" style="margin-top: 10px; font-size: 12px; color: #666;">
+            <div id="analysisStatus" style="margin-top: 10px; font-size: 12px; color: var(--u-muted, #666);">
                 📈 Initializing computer vision analysis...
             </div>
         </div>
@@ -381,12 +392,12 @@
 <div id="milestone" class="tab-content">
   <h2 style="text-align:center;">Development Milestones</h2>
   <div style="display:flex;flex-direction:column;align-items:center;gap:15px;">
-         <img src="/tools/growth/IMG_5624.jpeg" alt="Milestone 1" style="max-width:100%;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.2);">
-    <img src="/tools/growth/IMG_5626.jpeg" alt="Milestone 2" style="max-width:100%;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.2);">
+         <img src="/tools/growth/IMG_5624.jpeg" alt="Milestone 1" style="max-width:100%;border-radius:8px;box-shadow:var(--u-sh, 0 2px 6px rgba(0,0,0,0.2));">
+    <img src="/tools/growth/IMG_5626.jpeg" alt="Milestone 2" style="max-width:100%;border-radius:8px;box-shadow:var(--u-sh, 0 2px 6px rgba(0,0,0,0.2));">
  
   </div>
 </div>
-    <div style="text-align:center;margin-top:25px;font-size:11px;color:#666;letter-spacing:0.5px;">
+    <div style="text-align:center;margin-top:25px;font-size:11px;color:var(--u-muted, #666);letter-spacing:0.5px;">
         Created by <strong>Ung MDKKU50</strong>
     </div>
 

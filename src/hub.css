@@ -4,7 +4,7 @@ html, body { margin: 0; padding: 0; }
 body {
   font-family: var(--u-font);
   background:
-    radial-gradient(1200px 480px at 50% -10%, #dbe7ff 0%, rgba(219, 231, 255, 0) 60%),
+    radial-gradient(1200px 480px at 50% -10%, var(--hub-glow, #dbe7ff) 0%, transparent 60%),
     var(--u-bg);
   color: var(--u-ink);
   min-height: 100dvh;
@@ -17,8 +17,8 @@ body {
 .hub-brand { display: inline-flex; align-items: center; gap: 10px; font-weight: 800; font-size: 30px; letter-spacing: -.02em; }
 .hub-brand .mark {
   width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center;
-  background: linear-gradient(135deg, var(--u-primary), #4f46e5); color: #fff; font-size: 22px;
-  box-shadow: 0 6px 18px rgba(37, 99, 235, .35);
+  background: linear-gradient(135deg, var(--u-primary), var(--hub-mark-end, #4f46e5)); color: #fff; font-size: 22px;
+  box-shadow: 0 6px 18px var(--hub-mark-sh, rgba(37, 99, 235, .35));
 }
 .hub-tagline { margin: 10px 0 0; color: var(--u-muted); font-size: 14px; }
 
@@ -37,10 +37,10 @@ body {
   min-height: 72px; transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
 }
 .tool-card:active { transform: translateY(1px) scale(.995); }
-@media (hover: hover) { .tool-card:hover { border-color: #cdddff; box-shadow: 0 8px 26px rgba(15, 23, 42, .10); } }
+@media (hover: hover) { .tool-card:hover { border-color: var(--hub-card-hover-border, #cdddff); box-shadow: var(--u-sh-lg); } }
 .tool-card .t-ico {
   flex: 0 0 auto; width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center;
-  font-size: 24px; background: var(--u-primary-tint); border: 1px solid #e0eaff;
+  font-size: 24px; background: var(--u-primary-tint); border: 1px solid var(--hub-ico-border, #e0eaff);
 }
 .tool-card .t-name { font-weight: 700; font-size: 16px; }
 .tool-card .t-desc { font-size: 13px; color: var(--u-muted); margin-top: 2px; }
@@ -54,3 +54,12 @@ body {
 .hub-theme-toggle { position: absolute; top: 16px; right: 16px; width: 42px; height: 42px; border-radius: 12px; border: 1px solid var(--u-line); background: var(--u-surface); color: var(--u-ink-2); font-size: 18px; cursor: pointer; box-shadow: var(--u-sh); }
 .hub-theme-toggle:hover { border-color: var(--u-line-2); }
 #hub { position: relative; }
+
+/* Dark-mode overrides for hub-specific variables */
+:root[data-theme="dark"] {
+  --hub-glow: rgba(91, 156, 255, .08);
+  --hub-mark-end: #6366f1;
+  --hub-mark-sh: rgba(91, 156, 255, .25);
+  --hub-card-hover-border: var(--u-line-2);
+  --hub-ico-border: var(--u-line);
+}

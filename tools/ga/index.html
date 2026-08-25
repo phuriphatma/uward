@@ -12,16 +12,20 @@
     <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
     <style>
         body {
-            font-family: sans-serif;
+            font-family: var(--u-font, sans-serif);
             padding: 20px;
             max-width: 1200px;
             margin: auto;
             position: relative;
             min-height: 100vh;
-            /* Improve scroll behavior */
             scroll-behavior: smooth;
-            /* Prevent scroll anchoring issues */
             overflow-anchor: none;
+            background: var(--u-bg, #eef2f7);
+            color: var(--u-ink, #0f172a);
+        }
+
+        h2, h3 {
+            color: var(--u-ink, #0f172a);
         }
 
         input,
@@ -30,6 +34,15 @@
             padding: 10px;
             margin: 10px 0;
             font-size: 16px;
+            box-sizing: border-box;
+        }
+
+        input[type="date"],
+        input[type="text"] {
+            background: var(--u-surface, #fff);
+            color: var(--u-ink, #0f172a);
+            border: 1px solid var(--u-line-2, #cbd5e1);
+            border-radius: 8px;
         }
 
         /* Mobile viewport fix for keyboard */
@@ -39,28 +52,23 @@
             body {
                 height: 100vh;
                 height: 100dvh;
-                /* Dynamic viewport height */
                 overflow-x: hidden;
                 margin: 0;
                 padding: 0;
-                /* Fix smooth scrolling to top */
                 scroll-behavior: smooth;
             }
 
             body {
                 padding: 0;
-                /* Remove any potential scroll barriers */
                 position: relative;
             }
 
             .tab-container {
                 padding: 10px;
                 padding-bottom: 50px;
-                /* Ensure smooth scrolling within container */
                 scroll-behavior: smooth;
             }
 
-            /* Add padding to tab buttons on mobile */
             .tab-buttons {
                 padding-top: 29px;
             }
@@ -85,7 +93,10 @@
         }
 
         pre {
-            background: #f9f9f9;
+            background: var(--u-surface-2, #f5f8fc);
+            color: var(--u-ink-2, #334155);
+            border: 1px solid var(--u-line, #e2e8f0);
+            border-radius: 8px;
             padding: 10px;
             white-space: pre-wrap;
         }
@@ -129,24 +140,25 @@
         .tab-button {
             flex: 1;
             padding: 15px;
-            background: #f0f0f0;
-            border: 1px solid #ccc;
+            background: var(--u-surface-2, #f0f0f0);
+            border: 1px solid var(--u-line-2, #ccc);
+            color: var(--u-ink-2, #334155);
             cursor: pointer;
             transition: background-color 0.3s;
             margin: 0;
         }
 
         .tab-button.active {
-            background: #007cba;
-            color: white;
+            background: var(--u-primary, #007cba);
+            color: #fff;
         }
 
         .tab-button:hover {
-            background: #e0e0e0;
+            background: var(--u-line, #e0e0e0);
         }
 
         .tab-button.active:hover {
-            background: #005a87;
+            background: var(--u-primary-700, #005a87);
         }
 
         .tab-content {
@@ -155,6 +167,177 @@
 
         .tab-content.active {
             display: block;
+        }
+
+        /* ---------- GA-specific button variants ---------- */
+        .ga-btn-clear {
+            background: var(--u-faint, #6c757d);
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+        }
+        .ga-btn-primary {
+            background: var(--u-primary, #007cba);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+            padding: 12px;
+        }
+        .ga-btn-help {
+            background: var(--u-surface-2, #f8f9fa);
+            color: var(--u-muted, #6c757d);
+            border: 1px solid var(--u-line, #dee2e6);
+            border-radius: 4px;
+            width: 24px;
+            height: 24px;
+            font-size: 12px;
+            cursor: pointer;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ---------- Instructions panel ---------- */
+        .ga-instructions {
+            background: var(--u-surface-2, #f8f9fa);
+            border: 1px solid var(--u-line, #dee2e6);
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            display: none;
+        }
+        .ga-instructions h4 {
+            margin: 0 0 8px 0;
+            color: var(--u-ink-2, #495057);
+            font-size: 14px;
+        }
+        .ga-instructions ul {
+            margin: 8px 0;
+            padding-left: 18px;
+            color: var(--u-muted, #6c757d);
+        }
+        .ga-instructions .ga-tip {
+            margin: 8px 0 0 0;
+            font-size: 12px;
+            color: var(--u-faint, #868e96);
+            font-style: italic;
+        }
+
+        /* ---------- Connection status badge ---------- */
+        .ga-status {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .ga-status.online {
+            background: var(--ga-status-online-bg, #e8f5e8);
+            color: var(--ga-status-online-ink, #2e7d2e);
+        }
+        .ga-status.offline {
+            background: var(--ga-status-offline-bg, #fff3cd);
+            color: var(--ga-status-offline-ink, #856404);
+        }
+
+        /* ---------- Footer ---------- */
+        .ga-footer {
+            background: var(--u-surface-2, #f5f5f5);
+            border-top: 2px solid var(--u-line, #ddd);
+            padding: 20px;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .ga-footer h3 { color: var(--u-ink, #333); margin-bottom: 10px; }
+        .ga-footer p { color: var(--u-muted, #666); }
+        .ga-footer .ga-footer-fine { font-size: 11px; color: var(--u-faint, #bbb); margin: 10px 0 0 0; font-style: italic; }
+
+        /* ---------- SVG dark mode ---------- */
+        #pregnancy-wheel text {
+            fill: var(--u-ink-2, #333);
+        }
+        #pregnancy-wheel circle {
+            stroke: var(--u-muted, #666);
+        }
+        #pregnancy-wheel line {
+            stroke: var(--u-faint, #666);
+        }
+        /* keep week-0/40 ticks red */
+        #pregnancy-wheel line.pw-edge {
+            stroke: red;
+        }
+        /* outer circle rim */
+        #pregnancy-wheel > circle:first-of-type {
+            stroke: var(--u-ink-2, #333);
+        }
+
+        /* ---------- Flatpickr dark mode ---------- */
+        :root[data-theme="dark"] .flatpickr-calendar {
+            background: var(--u-surface);
+            border-color: var(--u-line);
+            box-shadow: var(--u-sh-lg);
+        }
+        :root[data-theme="dark"] .flatpickr-months,
+        :root[data-theme="dark"] .flatpickr-weekdays,
+        :root[data-theme="dark"] .flatpickr-month {
+            background: var(--u-surface-2);
+            color: var(--u-ink);
+        }
+        :root[data-theme="dark"] .flatpickr-current-month .flatpickr-monthDropdown-months,
+        :root[data-theme="dark"] .flatpickr-current-month input.cur-year {
+            background: var(--u-surface-2);
+            color: var(--u-ink);
+        }
+        :root[data-theme="dark"] span.flatpickr-weekday {
+            color: var(--u-muted);
+            background: var(--u-surface-2);
+        }
+        :root[data-theme="dark"] .flatpickr-day {
+            color: var(--u-ink);
+        }
+        :root[data-theme="dark"] .flatpickr-day:hover {
+            background: var(--u-line);
+            border-color: var(--u-line);
+        }
+        :root[data-theme="dark"] .flatpickr-day.today {
+            border-color: var(--u-primary);
+        }
+        :root[data-theme="dark"] .flatpickr-day.selected {
+            background: var(--u-primary);
+            border-color: var(--u-primary);
+            color: #fff;
+        }
+        :root[data-theme="dark"] .flatpickr-day.prevMonthDay,
+        :root[data-theme="dark"] .flatpickr-day.nextMonthDay {
+            color: var(--u-faint);
+        }
+        :root[data-theme="dark"] .flatpickr-prev-month,
+        :root[data-theme="dark"] .flatpickr-next-month {
+            fill: var(--u-ink);
+            color: var(--u-ink);
+        }
+        :root[data-theme="dark"] .flatpickr-prev-month:hover svg,
+        :root[data-theme="dark"] .flatpickr-next-month:hover svg {
+            fill: var(--u-primary);
+        }
+        :root[data-theme="dark"] .flatpickr-innerContainer {
+            border-bottom: none;
+        }
+        :root[data-theme="dark"] .flatpickr-rContainer,
+        :root[data-theme="dark"] .flatpickr-days,
+        :root[data-theme="dark"] .dayContainer {
+            background: var(--u-surface);
+        }
+
+        /* Dark-mode overrides for GA-specific semantic colours */
+        :root[data-theme="dark"] {
+            --ga-status-online-bg: #0d2818;
+            --ga-status-online-ink: #3ecf8e;
+            --ga-status-offline-bg: #2a1f0a;
+            --ga-status-offline-ink: #fbbf24;
         }
     </style>
 
@@ -174,20 +357,17 @@
 
                     <div
                         style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <div id="connection-status"
-                            style="padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: 500;">
+                        <div id="connection-status" class="ga-status">
                             &#128241; Checking...
                         </div>
-                        <button onclick="toggleInstructions()"
-                            style="background: #f8f9fa; color: #6c757d; border: 1px solid #dee2e6; border-radius: 4px; width: 24px; height: 24px; font-size: 12px; cursor: pointer; padding: 0; display: inline-flex; align-items: center; justify-content: center;">
+                        <button onclick="toggleInstructions()" class="ga-btn-help">
                             ?
                         </button>
                     </div>
 
-                    <div id="instructions"
-                        style="background: #f8f9fa; border: 1px solid #dee2e6; padding: 12px; border-radius: 6px; margin-bottom: 15px; display: none; font-size: 13px;">
-                        <h4 style="margin: 0 0 8px 0; color: #495057; font-size: 14px;">How to Use:</h4>
-                        <ul style="margin: 8px 0; padding-left: 18px; color: #6c757d;">
+                    <div id="instructions" class="ga-instructions">
+                        <h4>How to Use:</h4>
+                        <ul>
                             <li><strong>LMP/EDC:</strong> Enter Last Menstrual Period or Expected Date of Confinement
                                 (optional)</li>
                             <li><strong>Known Date/GA:</strong> Enter a date where you know the exact gestational age
@@ -196,7 +376,7 @@
                             <li><strong>Clear buttons:</strong> Use individual clear buttons to reset specific sections
                             </li>
                         </ul>
-                        <p style="margin: 8px 0 0 0; font-size: 12px; color: #868e96; font-style: italic;">Tip: You can
+                        <p class="ga-tip">Tip: You can
                             mix and match any combination of inputs.</p>
                     </div>
 
@@ -206,28 +386,24 @@
                     <h3>EDC</h3>
                     <input type="date" id="edc" placeholder="EDC (optional)">
 
-                    <button onclick="clearLmpEdc()"
-                        style="background: #6c757d; color: white; border: none; border-radius: 4px;">Clear LMP /
+                    <button onclick="clearLmpEdc()" class="ga-btn-clear">Clear LMP /
                         EDC</button>
 
                     <h3>Known Date / GA</h3>
                     <input type="date" id="dateA" placeholder="Date A (known GA)">
                     <input type="text" id="gaA" placeholder="GA on Date A (e.g. 10+3)">
 
-                    <button onclick="clearKnownDateGA()"
-                        style="background: #6c757d; color: white; border: none; border-radius: 4px;">Clear Known Date /
+                    <button onclick="clearKnownDateGA()" class="ga-btn-clear">Clear Known Date /
                         GA</button>
 
                     <h3>Calculated Date / GA</h3>
                     <input type="date" id="dateB" placeholder="Date B (to find GA)">
                     <input type="text" id="gaB" placeholder="GA on Date B (e.g. 12+0)">
 
-                    <button onclick="clearCalculatedDateGA()"
-                        style="background: #6c757d; color: white; border: none; border-radius: 4px;">Clear Calculated
+                    <button onclick="clearCalculatedDateGA()" class="ga-btn-clear">Clear Calculated
                         Date / GA</button>
 
-                    <button onclick="calculate()"
-                        style="background: #007cba; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: 500; padding: 12px;">Calculate</button>
+                    <button onclick="calculate()" class="ga-btn-primary">Calculate</button>
 
                     <pre id="output"></pre>
                 </div>
@@ -240,10 +416,10 @@
                     <div id="pregnancy-wheel-container">
                         <svg id="pregnancy-wheel" width="400" height="400" viewBox="0 0 400 400">
                             <!-- Outer circle -->
-                            <circle cx="200" cy="200" r="180" stroke="#333" stroke-width="2" fill="none"></circle>
+                            <circle cx="200" cy="200" r="180" stroke-width="2" fill="none"></circle>
                             <!-- Inner circle (rotatable) -->
                             <g id="inner-circle">
-                                <circle cx="200" cy="200" r="140" stroke="#666" stroke-width="2" fill="none"></circle>
+                                <circle cx="200" cy="200" r="140" stroke-width="2" fill="none"></circle>
                             </g>
                         </svg>
                     </div>
@@ -282,12 +458,12 @@
             const statusElement = document.getElementById('connection-status');
             if (navigator.onLine) {
                 statusElement.innerHTML = '&#128310; Currently Online';
-                statusElement.style.background = '#e8f5e8';
-                statusElement.style.color = '#2e7d2e';
+                statusElement.classList.remove('offline');
+                statusElement.classList.add('online');
             } else {
                 statusElement.innerHTML = '&#128241; Currently Offline';
-                statusElement.style.background = '#fff3cd';
-                statusElement.style.color = '#856404';
+                statusElement.classList.remove('online');
+                statusElement.classList.add('offline');
             }
         }
 
@@ -340,7 +516,6 @@
             // Longer tick for week 0 and week 40
             // ✅ Inner circle week ticks — longer for 0 & 40, and red color for those
             const weekTickLength = (i === 0 || i === 40) ? 30 : 5;
-            const tickColor = (i === 0 || i === 40) ? "red" : "#666";
 
             const x1 = cx + 140 * Math.cos(angle);
             const y1 = cy + 140 * Math.sin(angle);
@@ -352,7 +527,7 @@
             line.setAttribute("y1", y1);
             line.setAttribute("x2", x2);
             line.setAttribute("y2", y2);
-            line.setAttribute("stroke", tickColor);
+            if (i === 0 || i === 40) line.classList.add("pw-edge");
             line.setAttribute("stroke-width", 1);
             innerCircleGroup.appendChild(line);
         }
@@ -379,7 +554,6 @@
                 line.setAttribute("y1", y1);
                 line.setAttribute("x2", x2);
                 line.setAttribute("y2", y2);
-                line.setAttribute("stroke", "#000");
                 line.setAttribute("stroke-width", 1); // always thin
                 svg.appendChild(line);
 
@@ -412,7 +586,6 @@
             monthLine.setAttribute("y1", my1);
             monthLine.setAttribute("x2", mx2);
             monthLine.setAttribute("y2", my2);
-            monthLine.setAttribute("stroke", "#333");
             monthLine.setAttribute("stroke-width", 2);
             svg.appendChild(monthLine);
 
@@ -537,21 +710,20 @@
     </script>
 
     <!-- End Credits -->
-    <footer
-        style="background: #f5f5f5; border-top: 2px solid #ddd; padding: 20px; text-align: center; margin-top: 50px;">
+    <footer class="ga-footer">
         <div style="max-width: 600px; margin: 0 auto;">
-            <h3 style="color: #333; margin-bottom: 10px;">Credits</h3>
-            <p style="font-size: 16px; color: #666; margin: 10px 0;">
+            <h3>Credits</h3>
+            <p style="font-size: 16px; margin: 10px 0;">
                 <strong>Created by:</strong> Ung MDKKU50
             </p>
-            <p style="font-size: 14px; color: #666; margin: 10px 0;">
+            <p style="font-size: 14px; margin: 10px 0;">
                 <strong>&#128241; This app works both online and offline</strong> - Save to your home screen for quick
                 access
             </p>
-            <p style="font-size: 14px; color: #999; margin: 5px 0;">
+            <p style="font-size: 14px; margin: 5px 0;">
                 <strong>&#9888; Disclaimer:</strong> Use at your own risk
             </p>
-            <p style="font-size: 11px; color: #bbb; margin: 10px 0 0 0; font-style: italic;">
+            <p class="ga-footer-fine">
                 Originally created for personal use - bugs may exist. Use the Settings tab to report issues.
             </p>
         </div>

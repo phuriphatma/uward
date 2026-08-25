@@ -810,13 +810,13 @@ class GrowthChartPlotter {
             if (config.chartType === 'HC') {
                 percentileDisplayHTML = `
                 <strong>📊 Head Circumference Percentile (Magnetic Curves):</strong><br>
-                <div style="background: #e8f5e8; padding: 8px; border-radius: 4px; margin: 5px 0; border-left: 4px solid #28a745;">
+                <div style="background: var(--gc-result-ok-bg, #e8f5e8); padding: 8px; border-radius: 4px; margin: 5px 0; border-left: 4px solid var(--u-good, #28a745);">
                     ${magneticWeightPercentile ? `<strong>Head:</strong> <span style="color: #800080;">●</span> ${this.formatPercentileResult(magneticWeightPercentile)}` : ''}
                 </div>`;
             } else {
                 percentileDisplayHTML = `
                 <strong>📊 Percentile Analysis (Magnetic Curves):</strong><br>
-                <div style="background: #e8f5e8; padding: 8px; border-radius: 4px; margin: 5px 0; border-left: 4px solid #28a745;">
+                <div style="background: var(--gc-result-ok-bg, #e8f5e8); padding: 8px; border-radius: 4px; margin: 5px 0; border-left: 4px solid var(--u-good, #28a745);">
                     ${magneticWeightPercentile ? `<strong>Weight:</strong> <span style="color: #ff0000;">●</span> ${this.formatPercentileResult(magneticWeightPercentile)}<br>` : ''}
                     ${magneticHeightPercentile ? `<strong>Height:</strong> <span style="color: #0066cc;">●</span> ${this.formatPercentileResult(magneticHeightPercentile)}` : ''}
                 </div>`;
@@ -834,7 +834,7 @@ class GrowthChartPlotter {
             
             percentileDisplayHTML = `
                 <strong>📊 Percentile Analysis:</strong><br>
-                <div style="background: #fff3cd; padding: 8px; border-radius: 4px; margin: 5px 0; border-left: 4px solid #ffc107;">
+                <div style="background: var(--gc-result-warn-bg, #fff3cd); padding: 8px; border-radius: 4px; margin: 5px 0; border-left: 4px solid var(--gc-warn-border, #ffc107);">
                     ${statusMessage}
                 </div>`;
         }
@@ -1003,7 +1003,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const clearButton = document.createElement('button');
     clearButton.textContent = 'Clear All Points';
     clearButton.style.marginTop = '10px';
-    clearButton.style.backgroundColor = '#dc3545';
+    clearButton.style.backgroundColor = 'var(--u-bad, #dc3545)';
     clearButton.onclick = () => window.chartPlotter.clearPoints();
     
     document.querySelector('.form-section').appendChild(clearButton);
@@ -1140,8 +1140,8 @@ GrowthChartPlotter.prototype.handleMultiPlot = function() {
 
     applicable.forEach(([key,cfg])=>{
             const card=document.createElement('div');
-            card.style.background='#fff'; card.style.border='1px solid #ddd'; card.style.borderRadius='8px'; card.style.padding='10px'; card.style.display='flex'; card.style.flexDirection='column'; card.style.gap='6px';
-            const title=document.createElement('div'); title.innerHTML=`<strong>${key}</strong> <small style="color:#666;">(${cfg.chartType})</small>`; card.appendChild(title);
+            card.style.background='var(--u-surface, #fff)'; card.style.border='1px solid var(--u-line, #ddd)'; card.style.borderRadius='8px'; card.style.padding='10px'; card.style.display='flex'; card.style.flexDirection='column'; card.style.gap='6px';
+            const title=document.createElement('div'); title.innerHTML=`<strong>${key}</strong> <small style="color:var(--u-muted, #666);">(${cfg.chartType})</small>`; card.appendChild(title);
             const canvas=document.createElement('canvas');
             // Temporary initial size; will be resized on image load for higher resolution
             canvas.width=10; canvas.height=10; canvas.style.border='1px solid #ccc'; card.appendChild(canvas); const ctx=canvas.getContext('2d');
@@ -1237,7 +1237,7 @@ GrowthChartPlotter.prototype.handleMultiPlot = function() {
                         }
                     }
                     const metricsRow=document.createElement('div'); metricsRow.style.display='flex'; metricsRow.style.flexWrap='wrap'; metricsRow.style.gap='6px';
-                    const buildBadge=(label,result)=>{ if(!result) return null; let text; if(result.type==='extreme'&&result.displayPercentile) text=`${label}: ${result.displayPercentile}`; else { text=`${label}: P${result.percentile.toFixed(1)}`; if(result.type==='range'||result.type==='interpolated_with_range') text+=` (${result.range})`; } const badge=document.createElement('span'); badge.textContent=text; badge.style.fontSize='11px'; badge.style.padding='3px 6px'; badge.style.borderRadius='12px'; badge.style.background='#eef2f7'; badge.style.border='1px solid #d0d7de'; badge.style.lineHeight='1.2'; const accent=label.startsWith('W/H')?'#6f42c1':(label.startsWith('Head')?'#800080':(label.startsWith('Height')?'#0066cc':'#ff0000')); badge.style.boxShadow=`inset 0 0 0 2px ${accent}20`; if(result.percentile!==undefined){ const p=result.percentile; if(p<3||p>97) badge.style.background='#ffe5e5'; else if(p<10||p>90) badge.style.background='#ffeccc'; else if(p>=25&&p<=75) badge.style.background='#e2f7e2'; } return badge; };
+                    const buildBadge=(label,result)=>{ if(!result) return null; let text; if(result.type==='extreme'&&result.displayPercentile) text=`${label}: ${result.displayPercentile}`; else { text=`${label}: P${result.percentile.toFixed(1)}`; if(result.type==='range'||result.type==='interpolated_with_range') text+=` (${result.range})`; } const badge=document.createElement('span'); badge.textContent=text; badge.style.fontSize='11px'; badge.style.padding='3px 6px'; badge.style.borderRadius='12px'; badge.style.background='var(--u-surface-2, #eef2f7)'; badge.style.border='1px solid var(--u-line, #d0d7de)'; badge.style.lineHeight='1.2'; const accent=label.startsWith('W/H')?'#6f42c1':(label.startsWith('Head')?'#800080':(label.startsWith('Height')?'#0066cc':'#ff0000')); badge.style.boxShadow=`inset 0 0 0 2px ${accent}20`; if(result.percentile!==undefined){ const p=result.percentile; if(p<3||p>97) badge.style.background='var(--gc-badge-danger, #ffe5e5)'; else if(p<10||p>90) badge.style.background='var(--gc-badge-warn, #ffeccc)'; else if(p>=25&&p<=75) badge.style.background='var(--gc-badge-good, #e2f7e2)'; } return badge; };
                     if(cfg.chartType==='HC') { const b=buildBadge('Head',weightPct); if(b) metricsRow.appendChild(b); }
                     else if(cfg.chartType==='WFH') {
                         const wfhBadge = buildBadge('W/H',weightPct);
@@ -1256,7 +1256,7 @@ GrowthChartPlotter.prototype.handleMultiPlot = function() {
                                 } else {
                                     const badge=document.createElement('span');
                                     badge.textContent = `W/H%: ${pctInt}%`;
-                                    badge.style.fontSize='11px'; badge.style.padding='3px 6px'; badge.style.borderRadius='12px'; badge.style.background='#f0eefc'; badge.style.border='1px solid #d0d7de'; badge.style.lineHeight='1.2'; badge.style.boxShadow='inset 0 0 0 2px #6f42c120';
+                                    badge.style.fontSize='11px'; badge.style.padding='3px 6px'; badge.style.borderRadius='12px'; badge.style.background='var(--u-surface-2, #f0eefc)'; badge.style.border='1px solid var(--u-line, #d0d7de)'; badge.style.lineHeight='1.2'; badge.style.boxShadow='inset 0 0 0 2px #6f42c120';
                                     metricsRow.appendChild(badge);
                                 }
                                 const wfhPanelBox = document.getElementById('wfhPercentileDisplay');
@@ -1275,7 +1275,7 @@ GrowthChartPlotter.prototype.handleMultiPlot = function() {
                                         box.style.lineHeight='1.4';
                                         const r = ratioInfo;
                                         const extremeLabel = (weightPct.percentile && weightPct.percentile<3) || (weightPct.displayPercentile && weightPct.displayPercentile.includes('<P3')) ? '<=P3' : '>=P97';
-                                        box.innerHTML = `<div style=\"padding:10px;border:1px solid #d0d7de;border-radius:8px;background:#fafbfc;\"><strong>W/H% Derivation (${extremeLabel})</strong><br>`+
+                                        box.innerHTML = `<div style=\"padding:10px;border:1px solid var(--u-line, #d0d7de);border-radius:8px;background:var(--u-surface-2, #fafbfc);\"><strong>W/H% Derivation (${extremeLabel})</strong><br>`+
                                             `Input Height: <strong>${height} cm</strong><br>`+
                                             `Input Weight: <strong>${weight} kg</strong><br>`+
                                             `Selected AGE Chart: <code>${r.sourceChart}</code><br>`+
@@ -1283,7 +1283,7 @@ GrowthChartPlotter.prototype.handleMultiPlot = function() {
                                             `Interpolated Median (P50) Weight at that Age: <strong>${r.weight50AtAge.toFixed(2)} kg</strong><br>`+
                                             `Formula: (Observed Weight / Median Weight_at_same_height_age) * 100<br>`+
                                             `= (${weight} / ${r.weight50AtAge.toFixed(2)}) * 100 = <strong>${r.percent.toFixed(1)}%</strong>`+
-                                            `<div style=\"margin-top:4px;color:#555;\">This percentage contextualizes how far ${(extremeLabel==='<=P3')?'below':'above'} the median weight the child is for the stature-equivalent age derived from the median height curve.</div>`+
+                                            `<div style=\"margin-top:4px;color:var(--u-muted, #555);\">This percentage contextualizes how far ${(extremeLabel==='<=P3')?'below':'above'} the median weight the child is for the stature-equivalent age derived from the median height curve.</div>`+
                                             `</div>`;
                                         resultsContent.appendChild(box);
                                         const resultsDiv=document.getElementById('results'); if(resultsDiv) resultsDiv.style.display='block';
@@ -1331,7 +1331,7 @@ GrowthChartPlotter.prototype.handleMultiPlot = function() {
                                         } else if(!weightBadge){
                                             const badge=document.createElement('span');
                                             badge.textContent=`Weight%: ${pctOfMedian.toFixed(0)}%`; // already contains % only once
-                                            badge.style.fontSize='11px'; badge.style.padding='3px 6px'; badge.style.borderRadius='12px'; badge.style.background='#f0eefc'; badge.style.border='1px solid #d0d7de'; badge.style.lineHeight='1.2'; badge.style.boxShadow='inset 0 0 0 2px #ff000020';
+                                            badge.style.fontSize='11px'; badge.style.padding='3px 6px'; badge.style.borderRadius='12px'; badge.style.background='var(--u-surface-2, #f0eefc)'; badge.style.border='1px solid var(--u-line, #d0d7de)'; badge.style.lineHeight='1.2'; badge.style.boxShadow='inset 0 0 0 2px #ff000020';
                                             metricsRow.appendChild(badge);
                                         }
                                         // Append derivation details in results
@@ -1342,12 +1342,12 @@ GrowthChartPlotter.prototype.handleMultiPlot = function() {
                                             const box=document.createElement('div');
                                             box.setAttribute('data-weight-extreme-process','1');
                                             box.style.marginTop='12px'; box.style.fontSize='12px'; box.style.lineHeight='1.4';
-                                            box.innerHTML = `<div style=\"padding:10px;border:1px solid #d0d7de;border-radius:8px;background:#fff8f8;\"><strong>Weight Extreme % of Median</strong><br>`+
+                                            box.innerHTML = `<div style=\"padding:10px;border:1px solid var(--u-line, #d0d7de);border-radius:8px;background:var(--u-surface-2, #fff8f8);\"><strong>Weight Extreme % of Median</strong><br>`+
                                                 `Age: <strong>${targetAge.toFixed(3)} years</strong><br>`+
                                                 `Observed Weight: <strong>${weight} kg</strong><br>`+
                                                 `Interpolated Median (P50) Weight at Age: <strong>${medianAtAge.toFixed(2)} kg</strong><br>`+
                                                 `Formula: (Observed / Median) * 100 = (${weight} / ${medianAtAge.toFixed(2)}) * 100 = <strong>${pctOfMedian.toFixed(1)}%</strong><br>`+
-                                                `<div style=\"margin-top:4px;color:#555;\">Provides quantitative context for deviation when percentile is beyond standard range (P3–P97).</div>`+
+                                                `<div style=\"margin-top:4px;color:var(--u-muted, #555);\">Provides quantitative context for deviation when percentile is beyond standard range (P3–P97).</div>`+
                                                 `</div>`;
                                             resultsContent.appendChild(box);
                                             const resultsDiv=document.getElementById('results'); if(resultsDiv) resultsDiv.style.display='block';
@@ -1392,7 +1392,7 @@ GrowthChartPlotter.prototype.handleMultiPlot = function() {
                                         } else if(!heightBadge){
                                             const badge=document.createElement('span');
                                             badge.textContent=`Height%: ${pctOfMedian.toFixed(0)}%`;
-                                            badge.style.fontSize='11px'; badge.style.padding='3px 6px'; badge.style.borderRadius='12px'; badge.style.background='#eef7ff'; badge.style.border='1px solid #d0d7de'; badge.style.lineHeight='1.2'; badge.style.boxShadow='inset 0 0 0 2px #0066cc20';
+                                            badge.style.fontSize='11px'; badge.style.padding='3px 6px'; badge.style.borderRadius='12px'; badge.style.background='var(--u-surface-2, #eef7ff)'; badge.style.border='1px solid var(--u-line, #d0d7de)'; badge.style.lineHeight='1.2'; badge.style.boxShadow='inset 0 0 0 2px #0066cc20';
                                             metricsRow.appendChild(badge);
                                         }
                                         // Derivation details in results
@@ -1401,12 +1401,12 @@ GrowthChartPlotter.prototype.handleMultiPlot = function() {
                                             const existing = resultsContent.querySelector('[data-height-extreme-process="1"]');
                                             if (existing) existing.remove();
                                             const box=document.createElement('div'); box.setAttribute('data-height-extreme-process','1'); box.style.marginTop='12px'; box.style.fontSize='12px'; box.style.lineHeight='1.4';
-                                            box.innerHTML = `<div style=\"padding:10px;border:1px solid #d0d7de;border-radius:8px;background:#f5faff;\"><strong>Height Extreme % of Median</strong><br>`+
+                                            box.innerHTML = `<div style=\"padding:10px;border:1px solid var(--u-line, #d0d7de);border-radius:8px;background:var(--u-surface-2, #f5faff);\"><strong>Height Extreme % of Median</strong><br>`+
                                                 `Age: <strong>${targetAge.toFixed(3)} years</strong><br>`+
                                                 `Observed Height: <strong>${height} cm</strong><br>`+
                                                 `Interpolated Median (P50) Height at Age: <strong>${medianHtAtAge.toFixed(2)} cm</strong><br>`+
                                                 `Formula: (Observed / Median) * 100 = (${height} / ${medianHtAtAge.toFixed(2)}) * 100 = <strong>${pctOfMedian.toFixed(1)}%</strong><br>`+
-                                                `<div style=\"margin-top:4px;color:#555;\">Quantifies deviation when height percentile lies outside standard range (P3–P97).</div>`+
+                                                `<div style=\"margin-top:4px;color:var(--u-muted, #555);\">Quantifies deviation when height percentile lies outside standard range (P3–P97).</div>`+
                                                 `</div>`;
                                             resultsContent.appendChild(box);
                                             const resultsDiv=document.getElementById('results'); if(resultsDiv) resultsDiv.style.display='block';
@@ -1450,7 +1450,7 @@ GrowthChartPlotter.prototype.handleMultiPlot = function() {
                 };
                 const rows=aggregate.map(r=>`<tr><td>${r.chart}</td><td>${r.measure}</td><td>${summarize(r)}</td><td>${r.result.type}</td><td>${r.result.confidence}</td></tr>`).join('');
                 const table=`<div style=\"margin-top:12px;\"><strong>Aggregate Percentiles</strong><table style=\"width:100%;border-collapse:collapse;font-size:12px;margin-top:4px;\">`+
-                `<thead><tr style=\\"background:#eee\\"><th style=\\"text-align:left;padding:4px;\\">Chart</th><th style=\\"text-align:left;padding:4px;\\">Measure</th><th style=\\"text-align:left;padding:4px;\\">Percentile</th><th style=\\"text-align:left;padding:4px;\\">Type</th><th style=\\"text-align:left;padding:4px;\\">Confidence</th></tr></thead>`+
+                `<thead><tr style=\\"background:var(--u-surface-2, #eee)\\"><th style=\\"text-align:left;padding:4px;\\">Chart</th><th style=\\"text-align:left;padding:4px;\\">Measure</th><th style=\\"text-align:left;padding:4px;\\">Percentile</th><th style=\\"text-align:left;padding:4px;\\">Type</th><th style=\\"text-align:left;padding:4px;\\">Confidence</th></tr></thead>`+
                 `<tbody>${rows}</tbody></table></div>`;
                 const existing=resultsContent.querySelectorAll('[data-aggregate-table=\"1\"]'); existing.forEach(el=>el.remove());
                 const wrapper=document.createElement('div'); wrapper.setAttribute('data-aggregate-table','1'); wrapper.innerHTML=table; resultsContent.appendChild(wrapper);

@@ -14,17 +14,17 @@ body,html{margin:0;padding:0;height:100%;overflow:hidden}
 #container{display:flex;height:100%;position:relative}
 
 /* Sidebar */
-#sidebar{width:250px;min-width:100px;max-width:80%;border-right:1px solid #ccc;
+#sidebar{width:250px;min-width:100px;max-width:80%;border-right:1px solid var(--line-2);
 display:flex;flex-direction:column;overflow:hidden}
-#sidebarHeader{display:flex;flex-direction:column;background:#fafafa;border-bottom:1px solid #ddd}
-#sidebarHeader button{width:100%;padding:12px;font-size:18px;background:#fff;border:none;
-border-bottom:1px solid #ddd;cursor:pointer}
+#sidebarHeader{display:flex;flex-direction:column;background:var(--surface-2);border-bottom:1px solid var(--line)}
+#sidebarHeader button{width:100%;padding:12px;font-size:18px;background:var(--surface);border:none;
+border-bottom:1px solid var(--line);cursor:pointer}
 #sidebarHeader button#addWardBtn{border-bottom:none}
 #wardListContainer{flex:1;overflow-y:auto;padding:8px}
 #wardList{list-style:none;margin:0;padding:0}
 #wardList li{padding:6px;margin:4px 0;border-radius:4px;cursor:pointer;user-select:none;border:1px solid transparent}
 #wardList li.selected{background:#def}
-#wardList li.over{border:2px solid #007bff; background: rgba(0,123,255,0.15); box-shadow: inset 4px 0 0 #007bff, 0 0 8px rgba(0,123,255,0.3);}
+#wardList li.over{border:2px solid var(--primary); background: color-mix(in srgb, var(--primary) 15%, transparent); box-shadow: inset 4px 0 0 var(--primary), 0 0 8px color-mix(in srgb, var(--primary) 30%, transparent);}
 #wardList li{position:relative}
 #wardList li .ward-delete{position:absolute;right:6px;top:50%;transform:translateY(-50%);opacity:0;pointer-events:none;transition:opacity .15s;background:#fee;color:#900;border:1px solid #c00;border-radius:3px;padding:2px 6px;font-size:12px;line-height:1}
 body.edit-wards #wardList li .ward-delete{opacity:1;pointer-events:auto}
@@ -39,16 +39,16 @@ body.edit-wards #wardList li .ward-delete{opacity:1;pointer-events:auto}
 
 /* Main area */
 #main{flex:1;display:flex;flex-direction:row;overflow:hidden}
-#bedContainer{flex:1;padding:10px;overflow-y:auto;scroll-behavior:smooth;border-right:1px solid #eee}
-#bedList .bed-item{display:flex;flex-direction:row;align-items:center;gap:8px;border-bottom:1px solid #eee;padding:8px 0;cursor:grab;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;}
+#bedContainer{flex:1;padding:10px;overflow-y:auto;scroll-behavior:smooth;border-right:1px solid var(--line)}
+#bedList .bed-item{display:flex;flex-direction:row;align-items:center;gap:8px;border-bottom:1px solid var(--line);padding:8px 0;cursor:grab;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;}
 #bedList .bed-item.select-mode{touch-action:none;-webkit-touch-callout:none;}
 body.dragging-bed{overflow:hidden;}
-#bedList .bed-item.over{border-top:3px solid #007bff;padding-top:5px}
+#bedList .bed-item.over{border-top:3px solid var(--primary);padding-top:5px}
 #bedList .bed-text{flex:1;display:flex;flex-direction:column;gap:4px}
 #bedList .bed-text .line1{font-weight:600;font-size:16px}
-#bedList .bed-text .line2{font-size:13px;color:#555}
+#bedList .bed-text .line2{font-size:13px;color:var(--ink-2)}
 #bedList .actions-row{display:flex;gap:8px}
-#bedList .actions-row button{padding:6px 12px;border-radius:4px;cursor:pointer;border:1px solid #ccc;background:#fff}
+#bedList .actions-row button{padding:6px 12px;border-radius:4px;cursor:pointer;border:1px solid var(--line-2);background:var(--surface)}
 #bedList .actions-row .delete{border-color:#c00;background:#fee;color:#900}
 #bedList .bed-text .line2{white-space:pre-wrap}
 /* Bed selection mode */
@@ -63,25 +63,25 @@ body.dragging-bed{overflow:hidden;}
 
 
 /* Sheet table picking mode visuals */
-#sheetTableWrap.picking{outline:2px dashed #007bff; outline-offset:2px}
+#sheetTableWrap.picking{outline:2px dashed var(--primary); outline-offset:2px}
 #sheetTableWrap.picking th,#sheetTableWrap.picking td{cursor:crosshair}
 
 /* Add Bed button: larger and with spacing from list */
-#addBedBtn{display:block;width:100%;padding:12px 14px;font-size:16px;border-radius:8px;border:1px solid #ccc;background:#f7f7f7;margin:8px 0 16px;cursor:pointer}
-#addBedBtn:not(:disabled):hover{background:#f0f0f0}
+#addBedBtn{display:block;width:100%;padding:12px 14px;font-size:16px;border-radius:8px;border:1px solid var(--line-2);background:var(--surface-2);margin:8px 0 16px;cursor:pointer}
+#addBedBtn:not(:disabled):hover{background:var(--line)}
 #addBedBtn:disabled{opacity:0.6;cursor:not-allowed}
 
 /* Quick I/O entry button (sidebar) */
-#sidebarHeader button#quickIOBtn{background:#007bff;color:#fff;font-weight:600;border-bottom:1px solid #006fe0;}
-#sidebarHeader button#quickIOBtn:hover{background:#006fe0;}
+#sidebarHeader button#quickIOBtn{background:var(--primary);color:#fff;font-weight:600;border-bottom:1px solid var(--primary-700);}
+#sidebarHeader button#quickIOBtn:hover{background:var(--primary-700);}
 
 /* Empty state shown when no ward is selected */
-.empty-state{text-align:center;padding:36px 16px;color:#666;display:flex;flex-direction:column;align-items:center;gap:10px;}
+.empty-state{text-align:center;padding:36px 16px;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:10px;}
 .empty-state .es-icon{font-size:40px;line-height:1;opacity:.85;}
-.empty-state .es-title{font-size:17px;font-weight:600;color:#333;margin:0;}
+.empty-state .es-title{font-size:17px;font-weight:600;color:var(--ink);margin:0;}
 .empty-state .quick-io-cta{display:inline-block;padding:14px 22px;font-size:16px;font-weight:600;background:#2563eb;color:#fff;border:none;border-radius:12px;cursor:pointer;box-shadow:0 8px 20px rgba(37,99,235,.28);}
 .empty-state .quick-io-cta:hover{background:#1d4ed8;}
-.empty-state .hint{font-size:13px;color:#999;margin:0;max-width:280px;}
+.empty-state .hint{font-size:13px;color:var(--muted);margin:0;max-width:280px;}
 
 /* Profile panel */
 #profilePanel{width:360px;max-width:100%;padding:16px;overflow-y:auto;display:none;background:#f9fafb}
@@ -89,13 +89,13 @@ body.dragging-bed{overflow:hidden;}
 #profilePanel h2{margin-top:0}
 #profilePanel label{display:block;margin:8px 0;font-weight:600}
 #profilePanel input,#profilePanel textarea,#profilePanel select{
-  width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;font-size:14px}
+  width:100%;padding:8px;border:1px solid var(--line-2);border-radius:4px;font-size:14px}
 #profilePanel .row{display:flex;gap:8px;align-items:center}
 #profilePanel .row label{flex:1}
 
 /* Expand button */
 #expandSidebarBtn{position:absolute;left:0;top:50px;width:24px;height:32px;
-padding:0;line-height:32px;text-align:center;border:1px solid #ccc;background:#fff;
+padding:0;line-height:32px;text-align:center;border:1px solid var(--line-2);background:var(--surface);
 border-radius:0 4px 4px 0;cursor:pointer;display:none;z-index:1000;font-size:18px}
 body.collapsed #sidebar,body.collapsed #resizer{display:none}
 /* Hide the sidebar indicator when collapsed */
@@ -115,7 +115,7 @@ body.collapsed #expandSidebarBtn{display:none}
 
 /* Modal content box */
 .modal-content {
-  background: #fff;
+  background:var(--surface);
   border-radius: 8px;
   padding: 16px;
   width: 90%;
@@ -128,8 +128,8 @@ body.collapsed #expandSidebarBtn{display:none}
 .modal h2 { margin-top: 0; }
 .modal label { display:block; margin:8px 0; font-weight:600; }
 .modal input, .modal textarea, .modal select {
-  width:100%; padding:9px 11px; border:1px solid #cbd5e1;
-  border-radius:9px; font-size:14px; color:#0f172a;
+  width:100%; padding:9px 11px; border:1px solid var(--line-2);
+  border-radius:9px; font-size:14px; color:var(--ink);
 }
 .modal input:focus, .modal textarea:focus, .modal select:focus{
   outline:none; border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,.15);
@@ -139,16 +139,16 @@ body.collapsed #expandSidebarBtn{display:none}
 }
 .modal button {
   padding:9px 14px; border-radius:9px; cursor:pointer; font-weight:500;
-  border:1px solid #cbd5e1; background:#fff; color:#334155;
+  border:1px solid var(--line-2); background:var(--surface); color:var(--ink-2);
 }
-.modal button:hover{ background:#f8fafc; }
+.modal button:hover{ background:var(--surface-2); }
 .modal button.save-btn {
   background:#2563eb; color:white; border-color:#2563eb;
 }
 .modal button.save-btn:hover{ background:#1d4ed8; border-color:#1d4ed8; }
 /* Google Sheet import: stepped sections */
-.sheet-step{ border:1px solid #eee; border-radius:10px; padding:12px; background:#fafbfc; }
-.sheet-step-title{ font-weight:700; font-size:14px; color:#1a2a44; margin-bottom:6px; }
+.sheet-step{ border:1px solid var(--line); border-radius:10px; padding:12px; background:var(--surface-2); }
+.sheet-step-title{ font-weight:700; font-size:14px; color:var(--ink); margin-bottom:6px; }
 .sheet-step .row{ flex-wrap:wrap; }
   /* Notify editor (scoped to #profilePage) */
   /* The Quick-Ward-Note / bed editor now follows the shared theme tokens, so it
@@ -234,7 +234,7 @@ body.collapsed #expandSidebarBtn{display:none}
     grid-column: 1;
     grid-row: 1 / -1;
     cursor: grab;
-    color: #999;
+    color:var(--muted);
     font-size: 16px;
     padding: 4px;
     user-select: none;
@@ -454,7 +454,7 @@ body.collapsed #expandSidebarBtn{display:none}
   #wardWorkPage input[list]::-webkit-calendar-picker-indicator{ display:none !important; opacity:0 !important; }
   #wardWorkPage input.wwWard::-webkit-calendar-picker-indicator,
   #wardWorkPage input.wwBed::-webkit-calendar-picker-indicator{ display:none !important; opacity:0 !important; }
-  #wardWorkPage .ww-block-handle{ cursor:grab; font-size:18px; padding:4px 6px; color:#666; user-select:none; }
+  #wardWorkPage .ww-block-handle{ cursor:grab; font-size:18px; padding:4px 6px; color:var(--muted); user-select:none; }
   #wardWorkPage .ww-block-handle:active{ cursor:grabbing; }
   #wardWorkPage .ww-task-handle{ cursor:grab; user-select:none; }
   #wardWorkPage .ww-task-handle:active{ cursor:grabbing; }
@@ -526,7 +526,7 @@ body.collapsed #expandSidebarBtn{display:none}
   /* Sidebar nav: clear, tappable rows with an icon chip (not a plain text list) */
   .side-nav{ display:flex; flex-direction:column; gap:6px; margin-top:6px; }
   .side-nav button{ display:flex; align-items:center; gap:12px; width:100%; text-align:left; justify-content:flex-start;
-    min-height:48px; padding:8px 12px; border-radius:12px; border:1px solid var(--line-2); background:#fff;
+    min-height:48px; padding:8px 12px; border-radius:12px; border:1px solid var(--line-2); background:var(--surface);
     font-size:15px; font-weight:600; color:var(--ink); box-shadow:var(--sh-sm); }
   .side-nav button:hover{ background:var(--surface-2); border-color:#94a3b8; }
   .side-nav button:active{ transform:translateY(1px); }
@@ -537,7 +537,7 @@ body.collapsed #expandSidebarBtn{display:none}
   .profiles-menu{ position:relative; margin-top:8px; }
   #sidebarHeader #profileMenuBtn{ width:100%; display:flex; align-items:center; gap:8px; min-height:48px; padding:10px 14px; border:1px solid var(--line);
     border-radius:12px; background:var(--surface-2); color:var(--ink); font-size:14px; }
-  #sidebarHeader #profileMenuBtn:hover{ border-color:var(--line-2); background:#fff; }
+  #sidebarHeader #profileMenuBtn:hover{ border-color:var(--line-2); background:var(--surface); }
   #profileMenuBtn .chip-eyebrow{ font-size:10px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); }
   #profileMenuBtn .chip-name{ font-weight:700; color:var(--ink); margin-left:2px; font-size:15px; }
   #profileMenuBtn .chip-caret{ margin-left:auto; color:var(--muted); font-size:14px; }
@@ -585,7 +585,7 @@ body.collapsed #expandSidebarBtn{display:none}
   #wardList li .wl-name{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   #wardList li .wl-count{ flex:0 0 auto; font-size:12px; font-weight:600; color:var(--muted);
     background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:1px 8px; }
-  #wardList li.selected .wl-count{ background:#fff; border-color:var(--primary-line,#bfdbfe); color:var(--primary-700); }
+  #wardList li.selected .wl-count{ background:var(--surface); border-color:var(--primary-line,#bfdbfe); color:var(--primary-700); }
   #wardList li.has-beds .wl-count{ color:var(--good); }
   body.edit-wards #wardList li .wl-count{ visibility:hidden; }
 
@@ -765,7 +765,7 @@ body.collapsed #expandSidebarBtn{display:none}
 
     /* ---- Bottom tab bar ---- */
     #mobileTabBar{ position:fixed; left:0; right:0; bottom:0; z-index:1200; display:flex;
-      background:rgba(255,255,255,.97); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
+      background:color-mix(in srgb, var(--surface) 97%, transparent); -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px);
       border-top:1px solid var(--line); box-shadow:0 -6px 20px rgba(15,23,42,.08);
       padding-bottom:env(safe-area-inset-bottom, 0px); }
     #mobileTabBar button{ flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px;

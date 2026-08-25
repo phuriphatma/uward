@@ -15,7 +15,9 @@
     <link rel="icon" href="/icons/icon.svg" type="image/svg+xml">
     <style>
         body {
-            font-family: sans-serif;
+            background: var(--u-bg, #eef2f7);
+            color: var(--u-ink, #0f172a);
+            font-family: var(--u-font, sans-serif);
             padding: 20px;
             max-width: 1200px;
             margin: auto;
@@ -29,10 +31,18 @@
 
         input,
         button {
+            box-sizing: border-box;
             width: 100%;
             padding: 10px;
             margin: 10px 0;
             font-size: 16px;
+        }
+
+        input[type="number"], select {
+            background: var(--u-surface, #fff);
+            color: var(--u-ink, #0f172a);
+            border: 1px solid var(--u-line-2, #cbd5e1);
+            border-radius: 8px;
         }
 
         /* Mobile viewport fix for keyboard */
@@ -77,7 +87,7 @@
                 font-weight: bold;
                 text-align: center;
                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-                border-bottom: 3px solid #333;
+                border-bottom: 3px solid var(--u-line-2, #333);
                 display: block !important;
                 animation: slideDown 0.3s ease-out;
                 /* Prevent scroll interference */
@@ -114,12 +124,19 @@
             }
         }
 
+        h2, h3 {
+            color: var(--u-ink, #0f172a);
+        }
+
         h2 {
             text-align: center;
         }
 
         pre {
-            background: #f9f9f9;
+            background: var(--u-surface-2, #f9f9f9);
+            color: var(--u-ink-2, #334155);
+            border: 1px solid var(--u-line, #e2e8f0);
+            border-radius: 8px;
             padding: 10px;
             white-space: pre-wrap;
         }
@@ -152,24 +169,25 @@
         .tab-button {
             flex: 1;
             padding: 15px;
-            background: #f0f0f0;
-            border: 1px solid #ccc;
+            background: var(--u-surface-2, #f0f0f0);
+            color: var(--u-ink-2, #334155);
+            border: 1px solid var(--u-line-2, #ccc);
             cursor: pointer;
             transition: background-color 0.3s;
             margin: 0;
         }
 
         .tab-button.active {
-            background: #007cba;
+            background: var(--u-primary, #007cba);
             color: white;
         }
 
         .tab-button:hover {
-            background: #e0e0e0;
+            background: var(--u-line, #e0e0e0);
         }
 
         .tab-button.active:hover {
-            background: #005a87;
+            background: var(--u-primary-700, #005a87);
         }
 
         .tab-content {
@@ -190,15 +208,16 @@
         .decimal-button {
             flex: 1;
             padding: 8px;
-            background: #f5f5f5;
-            border: 1px solid #ccc;
+            background: var(--u-surface-2, #f5f5f5);
+            color: var(--u-ink-2, #334155);
+            border: 1px solid var(--u-line-2, #ccc);
             cursor: pointer;
             font-size: 14px;
             margin: 0;
         }
 
         .decimal-button.active {
-            background: #28a745;
+            background: var(--u-good, #28a745);
             color: white;
         }
 
@@ -219,8 +238,8 @@
         }
 
         .clear-input {
-            background: #ffc107;
-            color: #000;
+            background: var(--avg-clear-bg, #ffc107);
+            color: var(--avg-clear-ink, #000);
             border: none;
             padding: 10px;
             cursor: pointer;
@@ -230,7 +249,7 @@
         }
 
         .remove-input {
-            background: #dc3545;
+            background: var(--u-bad, #dc3545);
             color: white;
             border: none;
             padding: 10px;
@@ -244,7 +263,8 @@
             font-weight: bold;
             text-align: center;
             padding: 20px;
-            background: #e3f2fd;
+            background: var(--u-primary-tint, #e3f2fd);
+            color: var(--u-ink, #0f172a);
             border-radius: 8px;
             margin: 20px 0;
         }
@@ -256,27 +276,34 @@
         }
 
         .add-input-btn {
-            background: #28a745;
+            background: var(--u-good, #28a745);
             color: white;
             flex: 1;
         }
 
         .clear-all-btn {
-            background: #dc3545;
+            background: var(--u-bad, #dc3545);
             color: white;
             flex: 1;
         }
 
         .remove-extra-btn {
-            background: #fd7e14;
+            background: var(--avg-remove-bg, #fd7e14);
             color: white;
             flex: 1;
         }
 
         .force-refresh-btn {
-            background: #6f42c1;
+            background: var(--avg-refresh-bg, #6f42c1);
             color: white;
             flex: 1;
+        }
+
+        :root[data-theme="dark"] {
+            --avg-clear-bg: #92780a;
+            --avg-clear-ink: #fff;
+            --avg-remove-bg: #c45d10;
+            --avg-refresh-bg: #7c3aed;
         }
     </style>
 
@@ -313,7 +340,7 @@
                     </div>
 
                     <h3>Auto-Skip Settings</h3>
-                    <p style="font-size: 14px; color: #666; margin: 5px 0;">Choose how many decimal places to type
+                    <p style="font-size: 14px; color: var(--u-muted, #666); margin: 5px 0;">Choose how many decimal places to type
                         before automatically jumping to the next input box:</p>
                     <div class="decimal-buttons">
                         <button class="decimal-button" onclick="setDecimalPrecision(0)">No decimals (skip

@@ -7,7 +7,7 @@ const KEY = 'uward-theme';
 
 export function currentTheme() {
   try { const v = localStorage.getItem(KEY); if (v === 'dark' || v === 'light') return v; } catch (e) {}
-  return (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  return 'light';
 }
 
 function apply(t) { document.documentElement.setAttribute('data-theme', t); refreshButtons(); }
