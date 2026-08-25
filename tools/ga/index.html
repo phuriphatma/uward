@@ -369,19 +369,30 @@
                         <h3 style="margin-top: 0; margin-bottom: 5px;">1. Set Pregnancy Anchor</h3>
                         <p style="font-size: 13px; color: var(--u-muted, #64748b); margin-top: 0;">Select the dating criteria to anchor the pregnancy.</p>
                         
-                        <div style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
-                            <label><input type="radio" name="anchorType" value="lmp" checked> LMP</label>
-                            <label><input type="radio" name="anchorType" value="edc"> EDC</label>
-                            <label><input type="radio" name="anchorType" value="usg"> Known Date + GA</label>
+                        <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 15px;">
+                            <div style="display: flex; flex-direction: column; gap: 5px;">
+                                <label style="font-weight: bold; font-size: 14px;">LMP Date</label>
+                                <input type="date" id="anchor-lmp" style="margin: 0; background: var(--u-surface, #fff); color: var(--u-ink, #0f172a); border: 1px solid var(--u-line-2, #cbd5e1); border-radius: 8px; padding: 10px; box-sizing: border-box; width: 100%;">
+                            </div>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 5px;">
+                                <label style="font-weight: bold; font-size: 14px;">EDC Date</label>
+                                <input type="date" id="anchor-edc" style="margin: 0; background: var(--u-surface, #fff); color: var(--u-ink, #0f172a); border: 1px solid var(--u-line-2, #cbd5e1); border-radius: 8px; padding: 10px; box-sizing: border-box; width: 100%;">
+                            </div>
+
+                            <div style="display: flex; gap: 10px; width: 100%;">
+                                <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px;">
+                                    <label style="font-weight: bold; font-size: 14px;">Known Date</label>
+                                    <input type="date" id="anchor-usg-date" style="margin: 0; background: var(--u-surface, #fff); color: var(--u-ink, #0f172a); border: 1px solid var(--u-line-2, #cbd5e1); border-radius: 8px; padding: 10px; box-sizing: border-box; width: 100%;">
+                                </div>
+                                <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px;">
+                                    <label style="font-weight: bold; font-size: 14px;">Known GA</label>
+                                    <input type="text" id="anchor-usg-ga" placeholder="e.g. 10+3" style="margin: 0; background: var(--u-surface, #fff); color: var(--u-ink, #0f172a); border: 1px solid var(--u-line-2, #cbd5e1); border-radius: 8px; padding: 10px; box-sizing: border-box; width: 100%;">
+                                </div>
+                            </div>
                         </div>
 
-                        <div id="anchor-inputs">
-                            <!-- Dynamically filled by JS -->
-                        </div>
-                        
-                        <div id="anchor-summary" style="margin-top: 15px; font-weight: bold; color: var(--u-primary, #0ea5e9); font-size: 15px; padding-top: 10px; border-top: 1px solid var(--u-line, #e2e8f0); display: none;">
-                            <!-- Shows resulting LMP and EDC based on input -->
-                        </div>
+                        <button id="clear-anchor-btn" class="ga-btn-clear" style="margin-top: 10px; margin-bottom: 0;">Clear Anchor</button>
                     </div>
 
                     <div style="background: var(--u-surface-2, #f8fafc); padding: 15px; border-radius: 8px; border: 1px solid var(--u-line, #e2e8f0);">
