@@ -353,59 +353,47 @@
         <div id="ga-calculator" class="tab-content active">
             <div class="container">
                 <div class="form-section">
-                    <h2>4-NewBox GA Calculator with LMP, EDC</h2>
+                    <h2>Instant GA Calculator</h2>
 
-                    <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <div id="connection-status" class="ga-status">
-                            &#128241; Checking...
+                    <div id="about-section" class="ga-instructions" style="display: block; margin-bottom: 20px;">
+                        <h4>Why this tool exists</h4>
+                        <p style="font-size: 14px; line-height: 1.5;">
+                            When rotating in the OB/GYN ward, finding a physical pregnancy wheel or a fast online tool was often frustrating. 
+                            This tool serves as a <strong>digital pregnancy wheel</strong>. It solves two main problems:
+                            <br>1. <strong>Instantly finding the dating anchor</strong> (LMP to EDC, or Ultrasound Date to LMP).
+                            <br>2. <strong>Infinite bidirectional projections:</strong> Once the anchor is set, you can instantly find out <i>"What GA will the patient be on this specific date?"</i> or <i>"On what date will the patient reach 37+0 weeks?"</i>. You can add as many dates as you want, and everything calculates backward and forward instantly as you type.
+                        </p>
+                    </div>
+
+                    <div style="background: var(--u-surface-2, #f8fafc); padding: 15px; border-radius: 8px; border: 1px solid var(--u-line, #e2e8f0); margin-bottom: 20px;">
+                        <h3 style="margin-top: 0; margin-bottom: 5px;">1. Set Pregnancy Anchor</h3>
+                        <p style="font-size: 13px; color: var(--u-muted, #64748b); margin-top: 0;">Select the dating criteria to anchor the pregnancy.</p>
+                        
+                        <div style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
+                            <label><input type="radio" name="anchorType" value="lmp" checked> LMP</label>
+                            <label><input type="radio" name="anchorType" value="edc"> EDC</label>
+                            <label><input type="radio" name="anchorType" value="usg"> Known Date + GA</label>
                         </div>
-                        <button onclick="toggleInstructions()" class="ga-btn-help">
-                            ?
-                        </button>
+
+                        <div id="anchor-inputs">
+                            <!-- Dynamically filled by JS -->
+                        </div>
+                        
+                        <div id="anchor-summary" style="margin-top: 15px; font-weight: bold; color: var(--u-primary, #0ea5e9); font-size: 15px; padding-top: 10px; border-top: 1px solid var(--u-line, #e2e8f0); display: none;">
+                            <!-- Shows resulting LMP and EDC based on input -->
+                        </div>
                     </div>
 
-                    <div id="instructions" class="ga-instructions">
-                        <h4>How to Use:</h4>
-                        <ul>
-                            <li><strong>LMP/EDC:</strong> Enter Last Menstrual Period or Expected Date of Confinement
-                                (optional)</li>
-                            <li><strong>Known Date/GA:</strong> Enter a date where you know the exact gestational age
-                            </li>
-                            <li><strong>Calculated Date/GA:</strong> Enter a date to calculate what the GA would be</li>
-                            <li><strong>Clear buttons:</strong> Use individual clear buttons to reset specific sections
-                            </li>
-                        </ul>
-                        <p class="ga-tip">Tip: You can
-                            mix and match any combination of inputs.</p>
+                    <div style="background: var(--u-surface-2, #f8fafc); padding: 15px; border-radius: 8px; border: 1px solid var(--u-line, #e2e8f0);">
+                        <h3 style="margin-top: 0; margin-bottom: 5px;">2. Target Projections</h3>
+                        <p style="font-size: 13px; color: var(--u-muted, #64748b); margin-top: 0;">Enter a Date to find the GA, or enter a GA to find the Date.</p>
+                        
+                        <div id="target-rows">
+                            <!-- Dynamic target rows injected here -->
+                        </div>
+                        
+                        <button id="add-target-btn" class="ga-btn-primary" style="background: var(--u-surface, #fff); color: var(--u-primary, #0ea5e9); border: 1px dashed var(--u-primary, #0ea5e9); margin-top: 10px;">+ Add another projection</button>
                     </div>
-
-                    <h3>LMP</h3>
-                    <input type="date" id="lmp" placeholder="LMP (optional)">
-
-                    <h3>EDC</h3>
-                    <input type="date" id="edc" placeholder="EDC (optional)">
-
-                    <button onclick="clearLmpEdc()" class="ga-btn-clear">Clear LMP /
-                        EDC</button>
-
-                    <h3>Known Date / GA</h3>
-                    <input type="date" id="dateA" placeholder="Date A (known GA)">
-                    <input type="text" id="gaA" placeholder="GA on Date A (e.g. 10+3)">
-
-                    <button onclick="clearKnownDateGA()" class="ga-btn-clear">Clear Known Date /
-                        GA</button>
-
-                    <h3>Calculated Date / GA</h3>
-                    <input type="date" id="dateB" placeholder="Date B (to find GA)">
-                    <input type="text" id="gaB" placeholder="GA on Date B (e.g. 12+0)">
-
-                    <button onclick="clearCalculatedDateGA()" class="ga-btn-clear">Clear Calculated
-                        Date / GA</button>
-
-                    <button onclick="calculate()" class="ga-btn-primary">Calculate</button>
-
-                    <pre id="output"></pre>
                 </div>
 
                 <div class="calendar-section">
@@ -690,6 +678,27 @@
             }
         }
 
+        window.updateWheelDates = function(lmpDate, edcDate) {
+            if (!lmpDate) return;
+            const start = new Date(lmpDate.getFullYear(), 0, 0);
+            const diff = lmpDate - start;
+            const dayOfYear = Math.floor(diff / (1000 * 60 * 60 * 24));
+            
+            rawRotation = (dayOfYear / 365) * 360;
+            const degreesPerWeek = (1 / 365) * 360;
+            snappedRotation = Math.round(rawRotation / degreesPerWeek) * degreesPerWeek;
+            
+            innerCircleGroup.setAttribute("transform", `rotate(${snappedRotation} ${cx} ${cy})`);
+            const texts = innerCircleGroup.querySelectorAll("text");
+            texts.forEach(text => {
+                const baseAngle = parseFloat(text.dataset.baseAngle);
+                const x = cx + 120 * Math.cos(baseAngle);
+                const y = cy + 120 * Math.sin(baseAngle);
+                text.setAttribute("x", x);
+                text.setAttribute("y", y);
+                text.setAttribute("transform", `rotate(${-snappedRotation} ${x} ${y})`);
+            });
+        };
     </script>
 
 
